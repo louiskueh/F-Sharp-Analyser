@@ -1,4 +1,6 @@
 # F-Sharp-Analyser
+* [Wiki](https://github.com/jovanhan2/F-Sharp-Analyser/wiki)
+* [Log](https://docs.google.com/spreadsheets/d/1E-dl3aIaSuBxb92qC-840WB-43ynQYcF3fNY1qzTq3g/edit?usp=sharing)
 F Sharp"Probable Error" Analysers for Ionide
 # Description
 The F# Compiler has a new feature (similar to that in the C# Roslyn compiler) called analysers. This allows intelligent editors
