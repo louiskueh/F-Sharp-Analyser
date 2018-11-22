@@ -2,6 +2,27 @@
 * [Wiki](https://github.com/jovanhan2/F-Sharp-Analyser/wiki)
 * [Log](https://docs.google.com/spreadsheets/d/1E-dl3aIaSuBxb92qC-840WB-43ynQYcF3fNY1qzTq3g/edit?usp=sharing)
 F Sharp"Probable Error" Analysers for Ionide
+# Custom analyzers with F#
+* build and compile into nupkg 
+* `dotnet restore `
+* `dotnet build`
+* `dotnet pack`
+* `dotnet pack --output nupkgs`
+
+After packing it unzip the nuget file into the packages directory where you want to test the analyzer.
+
+
+# Misc
+* install paket `dotnet tool install --global Paket --version 5.189.1`
+* paket restore
+* restart vscode
+
+
+* dotnet new classlib -lang F#
+* dotnet restore
+* rem edit the .fsproj file here as per the C# instructions
+* dotnet build
+* dotnet pack
 # Description
 The F# Compiler has a new feature (similar to that in the C# Roslyn compiler) called analysers. This allows intelligent editors
 easily to interact with the source code parse tree and provide style and coding help.
