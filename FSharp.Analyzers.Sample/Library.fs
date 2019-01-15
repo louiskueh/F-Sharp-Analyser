@@ -116,7 +116,11 @@ let rec visitDeclaration f d =
 let optionValueAnalyzer : Analyzer =
     fun ctx ->
         let state = ResizeArray<range>()
+        // m : A subtype of F# symbol that represents an F# method, property,
+        // event, function or value, including extension members.
         let handler (range: range) (m: FSharpMemberOrFunctionOrValue) =
+        // enclosing entity in docs? 
+        // http://fsharp.github.io/FSharp.Compiler.Service/reference/microsoft-fsharp-compiler-sourcecodeservices-fsharpmemberorfunctionorvalue.html
             let name = String.Join(".", m.DeclaringEntity.Value.FullName, m.DisplayName)
             if name = "Microsoft.FSharp.Core.FSharpOption`1.Value" then
                 state.Add range
@@ -124,7 +128,7 @@ let optionValueAnalyzer : Analyzer =
         state
         |> Seq.map (fun r ->
             { Type = "Option.Value analyzer"
-              Message = "Option.Value shouldn't be used test55"
+              Message = "Option.Value shouldn't be used test55 " + r.ToString()
               Code = "OV001"
               Severity = Warning
               Range = r
@@ -132,3 +136,5 @@ let optionValueAnalyzer : Analyzer =
 
         )
         |> Seq.toList
+
+

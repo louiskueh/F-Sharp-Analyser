@@ -1,7 +1,21 @@
+# Questions 
+https://github.com/fsharp/FSharp.Compiler.Service/blob/master/src/fsharp/range.fs#L137-137
+* What is r?
+* test bench, custom inputs
 # F-Sharp-Analyser
 * [Wiki](https://github.com/jovanhan2/F-Sharp-Analyser/wiki)
 * [Log](https://docs.google.com/spreadsheets/d/1E-dl3aIaSuBxb92qC-840WB-43ynQYcF3fNY1qzTq3g/edit?usp=sharing)
 F Sharp"Probable Error" Analysers for Ionide
+# First run
+* install paket `dotnet tool install --global Paket --version 5.189.1`
+* paket restore
+* restart vscode
+
+* dotnet new classlib -lang F#
+* dotnet restore
+* rem edit the .fsproj file here as per the C# instructions
+* dotnet build
+* dotnet pack
 # Custom analyzers with F#
 (On first build run paket restore)
 
@@ -15,17 +29,7 @@ After packing it unzip the nuget file into the packages directory where you want
 
 * set ```FSharp.enableAnalyzers```
 * set ```FSharp.analyzersPath``` (default is packages/Analyzers)
-# Misc
-* install paket `dotnet tool install --global Paket --version 5.189.1`
-* paket restore
-* restart vscode
 
-
-* dotnet new classlib -lang F#
-* dotnet restore
-* rem edit the .fsproj file here as per the C# instructions
-* dotnet build
-* dotnet pack
 
 # Errors
 Check ```netcoreapp2.2``` in fsproj matches your netsdk installed.
