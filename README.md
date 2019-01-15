@@ -11,7 +11,8 @@ F Sharp"Probable Error" Analysers for Ionide
 
 After packing it unzip the nuget file into the packages directory where you want to test the analyzer.
 
-
+* set ```FSharp.enableAnalyzers```
+* set ```FSharp.analyzersPath``` (default is packages/Analyzers)
 # Misc
 * install paket `dotnet tool install --global Paket --version 5.189.1`
 * paket restore
