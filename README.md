@@ -23,6 +23,11 @@ After packing it unzip the nuget file into the packages directory where you want
 * rem edit the .fsproj file here as per the C# instructions
 * dotnet build
 * dotnet pack
+
+# Errors
+Check ```netcoreapp2.2``` in fsproj matches your netsdk installed.
+
+Check Fsharp language server logs and read info
 # Description
 The F# Compiler has a new feature (similar to that in the C# Roslyn compiler) called analysers. This allows intelligent editors
 easily to interact with the source code parse tree and provide style and coding help.
