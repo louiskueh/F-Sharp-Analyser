@@ -3,13 +3,15 @@
 * [Log](https://docs.google.com/spreadsheets/d/1E-dl3aIaSuBxb92qC-840WB-43ynQYcF3fNY1qzTq3g/edit?usp=sharing)
 F Sharp"Probable Error" Analysers for Ionide
 # Custom analyzers with F#
+(On first build run paket restore)
+
 * build and compile into nupkg 
 * `dotnet restore `
 * `dotnet build`
 * `dotnet pack`
 * `dotnet pack --output nupkgs`
 
-After packing it unzip the nuget file into the packages directory where you want to test the analyzer.
+After packing it unzip the nuget file into the packages directory where you want to test the analyzer. Next change the analyzer path or open the folder only with the analyzer to test
 
 * set ```FSharp.enableAnalyzers```
 * set ```FSharp.analyzersPath``` (default is packages/Analyzers)
