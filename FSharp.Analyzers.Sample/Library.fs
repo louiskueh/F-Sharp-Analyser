@@ -120,7 +120,14 @@ let optionValueAnalyzer : Analyzer =
             let name = String.Join(".", m.DeclaringEntity.Value.FullName, m.DisplayName)
             if name = "Microsoft.FSharp.Core.FSharpOption`1.Value" then
                 state.Add range
+        // how to log to something here?
         ctx.TypedTree.Declarations |> List.iter (visitDeclaration handler)
+        printfn "##################################################################"
+        printfn "ctx: %A" ctx
+
+        printfn "################################################################## \n"
+        let parseTree = ctx.ParseTree
+        // parseTree.
         state
         |> Seq.map (fun r ->
             { Type = "Option.Value analyzer"
