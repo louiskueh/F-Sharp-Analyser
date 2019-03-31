@@ -28,6 +28,8 @@ After packing it unzip the nuget file into the packages directory where you want
 * dotnet pack
 
 # Errors
+* newest version of ionide 3.34 has errors relatig to updated FSAC
+* use ionide 3.33 and disable auto updating 
 Check ```netcoreapp2.2``` in fsproj matches your netsdk installed.
 
 Check Fsharp language server logs and read info
