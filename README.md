@@ -30,6 +30,7 @@ After packing it unzip the nuget file into the packages directory where you want
 # Errors
 * newest version of ionide 3.34 has errors relatig to updated FSAC
 * use ionide 3.33 and disable auto updating 
+* requries fsharp.analysers.sdk 0.0.1,  0.0.4 doesn't work
 Check ```netcoreapp2.2``` in fsproj matches your netsdk installed.
 
 Check Fsharp language server logs and read info
