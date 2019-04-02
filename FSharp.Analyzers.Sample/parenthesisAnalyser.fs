@@ -13,9 +13,11 @@ let rec visitExpression handler=
         match expr with 
         | SynExpr.FromParseError(expr, range) ->
            handler range expr
-           Some range
-        | _ -> None
-    | _-> None
+        | _ -> ()
+    | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, m) -> 
+        visitExpression handler funcExpr
+        visitExpression handler argExpr
+    | _ -> ()
         
 
 
@@ -41,6 +43,7 @@ let visitModulesAndNamespaces handler modulesOrNss =
 let paranthesis : Analyzer =
     fun ctx ->
         let state = ResizeArray<range>()
+        // handler adds the range to display
         let handler (range: range) (m: SynExpr) =
             printfn "###################################"
             printfn "SynExpr type %A" m
@@ -57,9 +60,9 @@ let paranthesis : Analyzer =
         // parseTree.
         state
         |> Seq.map (fun r ->
-            { Type = "Option.Value analyzer"
+            { Type = "Parenthesis Analyser"
               Message = "Possible bracket error"
-              Code = "OV001"
+              Code = "P001"
               Severity = Warning
               Range = r
               Fixes = []}
