@@ -6,8 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-  <Compile Include="parenthesisAnalyser.fs" />
-    <!-- <Compile Include="Library.fs" /> -->
+  <Compile Include="ListFloatAnalyzer.fs" />
+  <!-- <Compile Include="parenthesisAnalyser.fs" /> -->
+    <Compile Include="example.fs" />
   </ItemGroup>
 
     <ItemGroup>

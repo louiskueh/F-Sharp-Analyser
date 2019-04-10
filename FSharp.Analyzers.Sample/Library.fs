@@ -1,10 +1,10 @@
-module SampleAnalyzer
+module SampleAnalyzerExample
 
 open System
 open FSharp.Analyzers.SDK
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.Range
-open Microsoft.FSharp.Compiler.Ast
+
 let rec visitExpr memberCallHandler (e:FSharpExpr) =
     match e with
     | BasicPatterns.AddressOf(lvalueExpr) ->
@@ -120,24 +120,11 @@ let optionValueAnalyzer : Analyzer =
             let name = String.Join(".", m.DeclaringEntity.Value.FullName, m.DisplayName)
             if name = "Microsoft.FSharp.Core.FSharpOption`1.Value" then
                 state.Add range
-        // how to log to something here?
         ctx.TypedTree.Declarations |> List.iter (visitDeclaration handler)
-        printfn "##################################################################"
-        printfn "ctx: %A" ctx
-
-        printfn "################################################################## \n"
-        let parseTree = ctx.ParseTree
-        match parseTree with
-        | ParsedInput.ImplFile(implFile) ->
-            // Extract declarations and walk over them
-            let (ParsedImplFileInput(fn, script, name, _, _, modules, _)) = implFile
-            visitModulesAndNamespaces modules
-        | _ -> failwith "F# Interface file (*.fsi) not supported."
-        // parseTree.
         state
         |> Seq.map (fun r ->
             { Type = "Option.Value analyzer"
-              Message = "Option.Value shouldn't be used test55"
+              Message = "Option.Value shouldn't be used"
               Code = "OV001"
               Severity = Warning
               Range = r
