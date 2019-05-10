@@ -1,15 +1,18 @@
-module ListFloatAnalyzer
+module TooManyArgs1C
 open System
 open FSharp.Analyzers.SDK
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.Range
 open System.IO
+open System.Text.RegularExpressions
+open System.Text.RegularExpressions
+let (|FirstRegexGroup|_|) pattern input =
+   let m = Regex.Match(input,pattern) 
+   if (m.Success) then Some m.Groups else None  
 
-// let foundType (range:range) (typeList:FSharpType list)  (state:ResizeArray<range>) = 
-//     printfn "Found type %A" (typeList.[0])
-//     let x = string typeList.[0]
-//     if x = "type Microsoft.FSharp.Core.int Microsoft.FSharp.Collections.list -> Microsoft.FSharp.Core.obj" then
-//         state.Add range
+
+
+
 let rec visitExpr memberCallHandler (e:FSharpExpr) =
     match e with
     | BasicPatterns.AddressOf(lvalueExpr) ->
@@ -131,8 +134,21 @@ let parseAndCheckSingleFile (input) =
 
     checker.ParseAndCheckProject (fprojOptions)
     |> Async.RunSynchronously
+let testRegex str = 
+    match str with
+     // | FirstRegexGroup "error (FS\d\d\d\d): The type ''a -> 'b' does not match the type '(.*)'" host -> 
+    | FirstRegexGroup "The type '(.*) -> (.*)' does not match the type '(.*)'" host -> 
+        //    printfn "Found %s Error with type %s" host.[1].Value host.[2].Value
+           "FS0001"
+        //    (host.[1].Value,host.[2].Value, host.[3].Value)
+    | _ -> ""
+        // ("","", "")
+        //    printfn "The value '%s' is something else" str
+        //    The type 'int -> obj' does not match the type 'int'
+
 [<Analyzer>]
-let ListFloatAnalyzer : Analyzer =
+let TooManyArgs1C : Analyzer =
+    printfn "1CTooManyArgs Analyzer"
     fun ctx ->
         printfn "CTX string %A" ctx
         let state = ResizeArray<range>()
@@ -140,19 +156,31 @@ let ListFloatAnalyzer : Analyzer =
         let checkProjectResults = parseAndCheckSingleFile(string)
         // printfn "Errors: %A" checkProjectResults.Errors
         for x in checkProjectResults.Errors do
-            printfn "Error message: %s" x.Message
+            // printfn "Error info %A" x
+            // printfn "Error Number %i" x.ErrorNumber
+            // printfn "Start column %i" x.StartColumn
+            // printfn "end column %i" x.EndColumn
+            // printfn "StartLine alternate %i" x.StartLineAlternate
+            // printfn "EndLine alternate %i" x.EndLineAlternate
+            // printfn "Error message %s" x.Message
+            let t = testRegex x.Message
             // printfn "2message: \"The type 'int' does not support the operator 'DivideByInt'\"" 
-            if x.Message = "The type 'int' does not support the operator 'DivideByInt'" then
-                printfn "Inside!"
+            if x.Subcategory = "typecheck" && t = "FS0001" then
+                printfn "Inside FS0001"
                 let handler (range: range) (m: FSharpMemberOrFunctionOrValue) = 
                     printfn "m %A" m
-                    if m.ToString() = "val op_Range" then
-                        state.Add range
-                        printfn"Added op_range %A" range
+                    printfn "Parameters %A" m.GenericParameters
+                    printfn "FullType %A" m.FullType
+                    printfn "Curried Parameter Groups %A" m.CurriedParameterGroups
+                    printfn "range %A" range
+                    printfn "typedTreeDeclarations %A" ctx.TypedTree.Declarations 
+                    // if m.ToString() = "val op_Range" then
+                    //     state.Add range
+                    //     printfn"Added op_range %A" range
                 ctx.TypedTree.Declarations |> List.iter (visitDeclaration handler)
         state
         |> Seq.map (fun r ->
-            { Type = "ListFloat Analyzer"
+            { Type = "MismatchedTypes Analyzer"
               Message = "Using List Operations usually requires float instead of int"
               Code = "A"
               Severity = Warning
