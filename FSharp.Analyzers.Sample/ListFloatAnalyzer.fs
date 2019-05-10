@@ -1,8 +1,8 @@
 module ListFloatAnalyzer
 open System
 open FSharp.Analyzers.SDK
-open Microsoft.FSharp.Compiler.SourceCodeServices
-open Microsoft.FSharp.Compiler.Range
+open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Range
 open System.IO
 
 // let foundType (range:range) (typeList:FSharpType list)  (state:ResizeArray<range>) = 

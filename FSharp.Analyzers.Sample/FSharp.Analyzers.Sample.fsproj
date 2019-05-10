@@ -2,17 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-  <Compile Include="ListFloatAnalyzer.fs" />
-  <!-- <Compile Include="parenthesisAnalyser.fs" /> -->
-    <Compile Include="example.fs" />
+  <!-- <Compile Include="ListFloatAnalyzer.fs" /> -->
+  <Compile Include="parenthesisAnalyser.fs" />
+    <!-- <Compile Include="example.fs" /> -->
   </ItemGroup>
-
-    <ItemGroup>
-    <PackageReference Include="FSharp.Analyzers.SDK" Version="0.0.1" />
+  <!-- <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.6.2" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="FSharp.Analyzers.SDK" Version="0.0.4" />
+  </ItemGroup> -->
+  <!-- <Import Project="..\FSharp.Analyzers.Sample\.paket\Paket.Restore.targets" /> -->
 </Project>

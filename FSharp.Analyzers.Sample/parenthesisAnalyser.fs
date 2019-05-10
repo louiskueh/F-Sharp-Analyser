@@ -2,9 +2,9 @@ module SampleAnalyzer
 
 open System
 open FSharp.Analyzers.SDK
-open Microsoft.FSharp.Compiler.SourceCodeServices
-open Microsoft.FSharp.Compiler.Range
-open Microsoft.FSharp.Compiler.Ast
+open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Range
+open FSharp.Compiler.Ast
 
 
 let rec visitExpression handler= 
