@@ -14,6 +14,7 @@ let (|FirstRegexGroup|_|) pattern input =
 
 
 let rec visitExpr memberCallHandler (e:FSharpExpr) =
+    printfn "Type of EXPR %A StringForm %s" e.Type (e.ToString())
     match e with
     | BasicPatterns.AddressOf(lvalueExpr) ->
         visitExpr memberCallHandler lvalueExpr
@@ -23,6 +24,13 @@ let rec visitExpr memberCallHandler (e:FSharpExpr) =
         visitExpr memberCallHandler funcExpr; visitExprs memberCallHandler argExprs
     | BasicPatterns.Call(objExprOpt, memberOrFunc, typeArgs1, typeArgs2, argExprs) ->
         // foundType e.Range typeArgs2 state
+        // let m = memberOrFunc
+        // printfn "INSIDE CALL with typeArgs1 %A typeArgs2 %A argExprs %A"  typeArgs1 typeArgs2 argExprs
+        // printfn "DisplayName %A" m.DisplayName
+        // printfn "FullType %A" m.FullType
+        // printfn "Is function? %A" m.IsTypeFunction
+        // printfn "Logical Name %A" m.LogicalName
+        // printfn "Parameters %A" m.GenericParameters
         memberCallHandler e.Range memberOrFunc
         visitObjArg memberCallHandler objExprOpt; visitExprs memberCallHandler argExprs
     | BasicPatterns.Coerce(targetType, inpExpr) ->
@@ -40,6 +48,15 @@ let rec visitExpr memberCallHandler (e:FSharpExpr) =
     | BasicPatterns.Lambda(lambdaVar, bodyExpr) ->
         visitExpr memberCallHandler bodyExpr
     | BasicPatterns.Let((bindingVar, bindingExpr), bodyExpr) ->
+        let m = bindingVar
+        printfn "INSIDE Let with bindingExpr %A and bodyExpr %A"  bindingExpr bodyExpr
+        printfn "DisplayName %A" m.DisplayName
+        printfn "FullType %A" m.FullType
+        printfn "Is function? %A" m.IsTypeFunction
+        printfn "Logical Name %A" m.LogicalName
+        printfn "Parameters %A" m.GenericParameters
+   
+
         visitExpr memberCallHandler bindingExpr; visitExpr memberCallHandler bodyExpr
     | BasicPatterns.LetRec(recursiveBindings, bodyExpr) ->
         List.iter (snd >> visitExpr memberCallHandler) recursiveBindings; visitExpr memberCallHandler bodyExpr
@@ -154,30 +171,46 @@ let TooManyArgs1C : Analyzer =
         let state = ResizeArray<range>()
         let string = ctx.Content |> String.concat "\n"
         let checkProjectResults = parseAndCheckSingleFile(string)
+        let handler (range: range) (m: FSharpMemberOrFunctionOrValue) =()
+        ctx.TypedTree.Declarations |> List.iter (visitDeclaration handler)
         // printfn "Errors: %A" checkProjectResults.Errors
-        for x in checkProjectResults.Errors do
-            // printfn "Error info %A" x
-            // printfn "Error Number %i" x.ErrorNumber
-            // printfn "Start column %i" x.StartColumn
-            // printfn "end column %i" x.EndColumn
-            // printfn "StartLine alternate %i" x.StartLineAlternate
-            // printfn "EndLine alternate %i" x.EndLineAlternate
-            // printfn "Error message %s" x.Message
-            let t = testRegex x.Message
-            // printfn "2message: \"The type 'int' does not support the operator 'DivideByInt'\"" 
-            if x.Subcategory = "typecheck" && t = "FS0001" then
-                printfn "Inside FS0001"
-                let handler (range: range) (m: FSharpMemberOrFunctionOrValue) = 
-                    printfn "m %A" m
-                    printfn "Parameters %A" m.GenericParameters
-                    printfn "FullType %A" m.FullType
-                    printfn "Curried Parameter Groups %A" m.CurriedParameterGroups
-                    printfn "range %A" range
-                    printfn "typedTreeDeclarations %A" ctx.TypedTree.Declarations 
-                    // if m.ToString() = "val op_Range" then
-                    //     state.Add range
-                    //     printfn"Added op_range %A" range
-                ctx.TypedTree.Declarations |> List.iter (visitDeclaration handler)
+        // for i = 1 to checkProjectResults.Errors.Length do
+        //     printfn "Error %d %s" i checkProjectResults.Errors.[i].Message
+
+        //     printfn "Subcategory: %s" checkProjectResults.Errors.[i].Subcategory
+
+        //     printfn "Error number: %d" checkProjectResults.Errors.[i].ErrorNumber
+        //     printfn "\n"
+        //     // printfn "Error info %A" x
+        //     // printfn "Error Number %i" x.ErrorNumber
+        //     // printfn "Start column %i" x.StartColumn
+        //     // printfn "end column %i" x.EndColumn
+        //     // printfn "StartLine alternate %i" x.StartLineAlternate
+        //     // printfn "EndLine alternate %i" x.EndLineAlternate
+        //     // printfn "Error message %s" x.Message
+        //     let t = testRegex checkProjectResults.Errors.[i].Message
+
+        //     // if x.Subcategory = "typecheck" && t = "FS0001" then
+        //     // printfn "Inside FS0001"
+        //     let handler (range: range) (m: FSharpMemberOrFunctionOrValue) =
+        //         ()
+        //         // printfn "DisplayName %A" m.DisplayName
+        //         // printfn "FullType %A" m.FullType
+        //         // printfn "Is function? %A" m.IsTypeFunction
+        //         // printfn "Logical Name %A" m.LogicalName
+        //         // printfn "Parameters %A" m.GenericParameters
+        //         // printfn "m %A" m
+        //         // printfn "Parameters %A" m.GenericParameters
+        //         // printfn "FullType %A" m.FullType
+        //         // printfn "Curried Parameter Groups %A" m.CurriedParameterGroups
+        //         // printfn "range %A" range
+        //         // printfn "typedTreeDeclarations %A" ctx.TypedTree.Declarations 
+        //         // if m.ToString() = "val op_Range" then
+        //         //     state.Add range
+        //         //     printfn"Added op_range %A" range
+        //     ctx.TypedTree.Declarations |> List.iter (visitDeclaration handler)
+           
+
         state
         |> Seq.map (fun r ->
             { Type = "MismatchedTypes Analyzer"
