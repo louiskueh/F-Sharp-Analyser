@@ -34,7 +34,7 @@ After packing it unzip the nuget file into the packages directory where you want
 Check ```netcoreapp2.2``` in fsproj matches your netsdk installed.
 
 Check Fsharp language server logs and read info
-
+* paket direcotry name/volume label syntax incorrect - obj/debug delete nuspec files
 # example context info
 ```fsharp
 ctx: {FileName =

@@ -4,7 +4,7 @@ open FSharp.Analyzers.SDK
 // open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.Range
 open Microsoft.FSharp.Compiler.Ast
-
+// TODO: Printing twice? - need async. Probabbly not needed?
 
 let rec visitExpression handler= 
     function 
@@ -31,6 +31,18 @@ let rec visitPattern =
             String.concat "." [for i in ident -> i.idText]
         printfn "  .. identifier: %s" names
     | pat -> printfn "  .. other pattern: %A" pat
+let visitSynVal (x:SynValData) =
+    match x with 
+    | SynValData (memberFlags,synvalInfo,indentOption) ->
+        // printfn "memberFlags %A" memberFlags
+        // printfn "SynvalInfo %A" synvalInfo
+        match synvalInfo with
+        | SynValInfo (curriedArgsInfo, returninfo) ->
+            printfn "curriedArgsInfo"  
+            for arg in curriedArgsInfo do
+                printfn "args %A" arg
+            printfn "returnInfo %A" returninfo
+        // printfn "indentOption %A" indentOption
     
 let visitDeclarations handler decls = 
     for declaration in decls do
@@ -39,9 +51,12 @@ let visitDeclarations handler decls =
             for binding in bindings do
                 let (Binding(access, kind, inlin, mutabl, attrs, xmlDoc, data, 
                              pat, retInfo, body, m, sp)) = binding
-                // printfn "in visitExpression Let"
-                visitPattern pat
+                printfn "################# \n"
+                visitSynVal data
+                // printfn "SynVal data : %A" data
+                // visitPattern pat
                 visitExpression handler body
+                printfn "################# \n"
         | _ -> ()
 
 let visitModulesAndNamespaces handler modulesOrNss = 
@@ -56,12 +71,11 @@ let visitModulesAndNamespaces handler modulesOrNss =
 [<Analyzer>]
 let paranthesis : Analyzer =
     printfn "Inside tooMany args!"
-    
     fun ctx ->
-        printfn "ctx %A" ctx.ParseTree
+        // printfn "ctx %A" ctx.ParseTree
         let state = ResizeArray<range>()
         // handler adds the range to display
-        let handler (range: range) (m: SynExpr) =
+        let handler (range: range) (m: SynExpr) = 
             printfn "###################################"
             printfn "SynExpr type %A" m
             printfn "###################################"
