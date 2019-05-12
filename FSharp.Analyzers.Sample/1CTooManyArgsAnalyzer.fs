@@ -9,6 +9,7 @@ open Microsoft.FSharp.Compiler.Ast
 let rec visitExpression handler= 
     function 
     | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, m) -> 
+        printfn "In APP with funcExpr %A | argExpr %A" funcExpr argExpr
         visitExpression handler funcExpr
         visitExpression handler argExpr
     | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->
@@ -16,10 +17,21 @@ let rec visitExpression handler=
         printfn "Bindings %A" bindings
         printfn "Body %A" body
         printfn "range %A" range
-    | _ -> printfn "unmatched!"
+    | x -> printfn "unmatched! %A " x
         
 
-
+let rec visitPattern = 
+    function 
+    | SynPat.Wild(_) -> printfn "  .. underscore pattern"
+    | SynPat.Named(pat, name, _, _, _) ->   
+        visitPattern pat
+        printfn "  .. named as '%s'" name.idText
+    | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
+        let names = 
+            String.concat "." [for i in ident -> i.idText]
+        printfn "  .. identifier: %s" names
+    | pat -> printfn "  .. other pattern: %A" pat
+    
 let visitDeclarations handler decls = 
     for declaration in decls do
         match declaration with
@@ -27,7 +39,8 @@ let visitDeclarations handler decls =
             for binding in bindings do
                 let (Binding(access, kind, inlin, mutabl, attrs, xmlDoc, data, 
                              pat, retInfo, body, m, sp)) = binding
-                printfn "in visitExpression Let"
+                // printfn "in visitExpression Let"
+                visitPattern pat
                 visitExpression handler body
         | _ -> ()
 
