@@ -18,13 +18,13 @@ let rec visitExpression handler=
         printfn "Bindings %A" bindings
         printfn "Body %A" body
         printfn "range %A" range
-    | SynExpr.Ident(name) -> printfn "name of function call: %A" name
+    | SynExpr.Ident(name) -> 
+        printfn "name of function call: %A" name
+        printfn "Checking %A exists with function names: %A " name (Map.containsKey (name.ToString()) functionNames)
     | x -> 
     printfn "unmatched! %A " x
-        
-
-
-    | pat -> printfn "  .. other pattern: %A" pat
+       
+    // | pat -> printfn "  .. other pattern: %A" pat
 let visitSynVal (x:SynValData) =
     match x with 
     | SynValData (memberFlags,synvalInfo,indentOption) ->
