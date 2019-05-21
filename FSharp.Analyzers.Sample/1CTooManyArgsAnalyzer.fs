@@ -7,10 +7,44 @@ open Microsoft.FSharp.Compiler.Ast
 // TODO: Printing twice? - need async. Probabbly not needed?
 let mutable functionNames = Map.empty
 
-let rec visitExpression handler= 
-    function 
-    | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, m) -> 
+// let rec countArg funcExpr (count: int byref) = 
+//     match funcExpr with 
+//     | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, m) -> 
+//         printfn "In COUNT with funcExpr %A | argExpr %A" funcExpr argExpr
+//         count <- count +  1
+//         printfn "count %d" count
+//         countArg funcExpr &count
+//         printfn "count FuncExpr %d" count
+//         countArg argExpr &count
+//         printfn "count Arg %d" count
+//     | SynExpr.Const(c,range) ->
+//         count <- count + 1
+//     | SynExpr.Ident(name)->
+//         count <- count + 1
+//     | x -> printfn "COUNT UNMATCHED %A" x
+
+
+
+let rec visitExpression handler body= 
+    match body with
+    | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) -> 
         // printfn "In APP with funcExpr %A | argExpr %A" funcExpr argExpr
+        match funcExpr with 
+        | SynExpr.Ident(name) -> 
+            printfn "name of function call: %A" name
+            let containsKey = (Map.containsKey (name.ToString()) functionNames)
+            printfn "Checking %A exists with function names: %A " name containsKey
+            if containsKey then
+                // let mutable count = 0
+                // countArg body &count  
+                let res = (functionNames.TryFind (name.ToString()))
+                let mutable numArgs = 0
+                match res with
+                    | Some y -> (numArgs <- y)
+                    | None -> ()
+                // printfn "num args %d" numArgs
+                handler range (name.ToString()) numArgs
+        | _ -> ()
         visitExpression handler funcExpr
         visitExpression handler argExpr
     | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->
@@ -18,11 +52,9 @@ let rec visitExpression handler=
         printfn "Bindings %A" bindings
         printfn "Body %A" body
         printfn "range %A" range
-    | SynExpr.Ident(name) -> 
-        printfn "name of function call: %A" name
-        printfn "Checking %A exists with function names: %A " name (Map.containsKey (name.ToString()) functionNames)
-    | x -> 
-    printfn "unmatched! %A " x
+
+    | x -> ()
+    // printfn "unmatched! %A " x
        
     // | pat -> printfn "  .. other pattern: %A" pat
 let visitSynVal (x:SynValData) =
@@ -90,10 +122,14 @@ let paranthesis : Analyzer =
         // printfn "ctx %A" ctx.ParseTree
         let state = ResizeArray<range>()
         // handler adds the range to display
-        let handler (range: range) (m: SynExpr) = 
-            printfn "###################################"
-            printfn "SynExpr type %A" m
-            printfn "###################################"
+        let mutable FunctionName = ""
+        let mutable ExpectedArguments = 0
+        let handler (range: range) functionName expectedArguments = 
+            // printfn "###################################"
+            // printfn "SynExpr type %A" m
+            // printfn "###################################"
+            FunctionName <- functionName
+            ExpectedArguments <- expectedArguments
             state.Add range
         let parseTree = ctx.ParseTree
         match parseTree with
@@ -101,14 +137,15 @@ let paranthesis : Analyzer =
             // Extract declarations and walk over them
             let (ParsedImplFileInput(fn, script, name, _, _, modules, _)) = implFile
             modules |>  List.iter (visitModulesAndNamespaces handler)
+  
             // visitModulesAndNamespaces modules
         | _ -> failwith "F# Interface file (*.fsi) not supported."
         printfn "functionNames %A" functionNames
         // parseTree.
         state
         |> Seq.map (fun r ->
-            { Type = "Parenthesis Analyser"
-              Message = "Possible bracket error"
+            { Type = "Wrong number of parameters"
+              Message = "Possibly wrong number of parameters for function " + FunctionName + ", which expects "+ ExpectedArguments.ToString() + " arguments "
               Code = "P001"
               Severity = Warning
               Range = r
