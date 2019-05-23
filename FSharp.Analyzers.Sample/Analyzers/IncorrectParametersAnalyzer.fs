@@ -4,7 +4,10 @@ open FSharp.Analyzers.SDK
 // open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.Range
 open Microsoft.FSharp.Compiler.Ast
-// TODO: Printing twice? - need async. Probabbly not needed?
+open Microsoft.FSharp.Compiler.SourceCodeServices
+open Microsoft.FSharp.Compiler.Range
+open System.IO
+
 let mutable functionNames = Map.empty
 
 // let rec countArg funcExpr (count: int byref) = 
@@ -112,7 +115,19 @@ let visitModulesAndNamespaces handler modulesOrNss =
     printfn "Namespace or module: %A" lid
     visitDeclarations handler decls
 
+let checker = FSharpChecker.Create(keepAssemblyContents=true)
+let parseAndCheckSingleFile (input) = 
+    let file = Path.ChangeExtension(System.IO.Path.GetTempFileName(), "fsx")  
+    File.WriteAllText(file, input)
+    // Get context representing a stand-alone (script) file
+    let projOptions, _errors = 
+        checker.GetProjectOptionsFromScript(file, input)
+        |> Async.RunSynchronously
 
+    let fprojOptions = projOptions
+
+    checker.ParseAndCheckProject (fprojOptions)
+    |> Async.RunSynchronously
 
 [<Analyzer>]
 let IncorrectParameters : Analyzer  =
@@ -120,27 +135,29 @@ let IncorrectParameters : Analyzer  =
     fun ctx ->
         printfn "ctx %A" ctx.ParseTree
         let state = ResizeArray<range>()
-        // handler adds the range to display
+        let string = ctx.Content |> String.concat "\n"
+        let checkProjectResults = parseAndCheckSingleFile(string)
+        // printfn "Errors: %A" checkProjectResults.Errors
         let mutable FunctionName = ""
         let mutable ExpectedArguments = 0
-        let handler (range: range) functionName expectedArguments = 
-            // printfn "###################################"
-            // printfn "SynExpr type %A" m
-            // printfn "###################################"
-            FunctionName <- functionName
-            ExpectedArguments <- expectedArguments
-            state.Add range
-        let parseTree = ctx.ParseTree
-        match parseTree with
-        | ParsedInput.ImplFile(implFile) ->
-            // Extract declarations and walk over them
-            let (ParsedImplFileInput(fn, script, name, _, _, modules, _)) = implFile
-            modules |>  List.iter (visitModulesAndNamespaces handler)
-  
-            // visitModulesAndNamespaces modules
-        | _ -> failwith "F# Interface file (*.fsi) not supported."
-        printfn "functionNames %A" functionNames
-        // parseTree.
+        if checkProjectResults.Errors.Length > 0 then
+            // handler adds the range to display
+            let handler (range: range) functionName expectedArguments = 
+                // printfn "###################################"
+                // printfn "SynExpr type %A" m
+                // printfn "###################################"
+                FunctionName <- functionName
+                ExpectedArguments <- expectedArguments
+                state.Add range
+            let parseTree = ctx.ParseTree
+            match parseTree with
+            | ParsedInput.ImplFile(implFile) ->
+                // Extract declarations and walk over them
+                let (ParsedImplFileInput(fn, script, name, _, _, modules, _)) = implFile
+                modules |>  List.iter (visitModulesAndNamespaces handler)
+            | _ -> failwith "F# Interface file (*.fsi) not supported."
+            printfn "functionNames %A" functionNames
+
         state
         |> Seq.map (fun r ->
             { Type = "Possibly wrong number of parameters"
