@@ -11,7 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
 
-    <Compile Include="IncorrectParametersAnalyser.fs" />
+    <Compile Include="Analyzers/IncorrectParametersAnalyzer.fs" />
     <!-- <Compile Include="ListFloatAnalyzer.fs" /> -->
     <!-- <Compile Include="parenthesisAnalyser.fs" /> -->
     <!-- <Compile Include="example.fs" /> -->
