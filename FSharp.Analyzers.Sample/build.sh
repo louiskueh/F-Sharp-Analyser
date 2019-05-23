@@ -1,6 +1,6 @@
 usage_Dir="FSharp.Analyzers.Sample.Usage/packages/analyzers/Fsharp.Analyzers.Sample/"
 packageName="FSharp.Analyzers.Sample.1.0.2.nupkg"
-dotnet pack --output nupkgs
+dotnet pack BuildAnalyser.fsproj --output nupkgs 
 echo "Compiled nupkg"
 cp -fr nupkgs/${packageName} ../${usage_Dir}
 echo "Copied nupkg to usage directory"

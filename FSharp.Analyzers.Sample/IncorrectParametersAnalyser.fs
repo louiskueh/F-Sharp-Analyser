@@ -1,4 +1,4 @@
-module ToomanyArgs
+module IncorrectParameters
 
 open FSharp.Analyzers.SDK
 // open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -114,12 +114,11 @@ let visitModulesAndNamespaces handler modulesOrNss =
 
 
 
-
 [<Analyzer>]
-let paranthesis : Analyzer =
+let IncorrectParameters : Analyzer  =
     printfn "Inside tooMany args!"
     fun ctx ->
-        // printfn "ctx %A" ctx.ParseTree
+        printfn "ctx %A" ctx.ParseTree
         let state = ResizeArray<range>()
         // handler adds the range to display
         let mutable FunctionName = ""
@@ -144,8 +143,8 @@ let paranthesis : Analyzer =
         // parseTree.
         state
         |> Seq.map (fun r ->
-            { Type = "Wrong number of parameters"
-              Message = "Possibly wrong number of parameters for function " + FunctionName + ", which expects "+ ExpectedArguments.ToString() + " arguments "
+            { Type = "Possibly wrong number of parameters"
+              Message = "For function " + FunctionName + ", which expects "+ ExpectedArguments.ToString() + " arguments "
               Code = "P001"
               Severity = Warning
               Range = r

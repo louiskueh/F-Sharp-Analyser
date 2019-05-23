@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+<!-- for testing -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+
+    <Compile Include="IncorrectParametersAnalyser.fs" />
+    <!-- <Compile Include="ListFloatAnalyzer.fs" /> -->
+    <!-- <Compile Include="parenthesisAnalyser.fs" /> -->
+    <!-- <Compile Include="example.fs" /> -->
+    
+    <Compile Include="Tests/IncorrectParametersTest.fs" />
+    <Compile Include="Tests/TestRunner.fs" />
+
+  </ItemGroup>
+
+
+  <Import Project=".paket\Paket.Restore.targets" />
+</Project>

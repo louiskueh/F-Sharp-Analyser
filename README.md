@@ -19,7 +19,9 @@ After packing it unzip the nuget file into the packages directory where you want
 * install paket `dotnet tool install --global Paket --version 5.189.1`
 * paket restore
 * restart vscode
-
+* Specify which solution to use - `dotnet ef ... -p ThisOne.csproj -s ThisOne.csproj`
+where `-p  --project <PROJECT> The project to use.
+-s  --startup-project <PROJECT> The startup project to use.`
 
 * dotnet new classlib -lang F#
 * dotnet restore
