@@ -41,28 +41,49 @@ let parseAndCheckSingleFile (input) =
 
 [<Tests>]  
 let tests =
-  testList "TooManyArgs test" [
-    test "paranthesis" {
+  testList "Too Many Parameters test" [
+    test "Default Case TooMany Parameters" {
       let input = """let add x y = x + y 
 let result = add 1 2 3
     """
+      let inputStringArray = input.Split "\n"
+
       // get implementation file contents (typed tree)
       let checkProjectResults = parseAndCheckSingleFile(input)
       let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
 
       // get untyped tree
       let tree = getUntypedTree(file, input) 
-      printfn "tree = %A" tree
+      // printfn "tree = %A" tree
       // mockIncorrectParamAnalyser tree
-      let mockContext:Context = {FileName=""; Content=null; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
       let result = IncorrectParameters mockContext
-      printfn "%A" result
       let expectedResult = "For function add, which expects 2 arguments "
       Expect.equal result.[0].Message expectedResult "Should detect function name correctly and identify correct number of arguments "
+    }
+    test "Default Case Too Few Parameters No error" {
+      let input = """let add x y = x + y 
+let result = add 1
+    """
+      // get implementation file contents (typed tree)
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let inputStringArray = input.Split "\n"
+      // printfn "TESTING "
+      // for x in inputStringArray do
+      //   printfn "string is %s" x
+      // printfn "TESTING "
+      // get untyped tree
+      let tree = getUntypedTree(file, input) 
+      // printfn "tree = %A" tree
+      // mockIncorrectParamAnalyser tree
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = IncorrectParameters mockContext
+      Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
 
     }
 
   ]
-  |> testLabel "Typography tests"
+  |> testLabel "Incorrect Parameter Tests"
 
 
