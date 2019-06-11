@@ -7,6 +7,12 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.Range
 
+//Random gen
+type System.Random with
+    /// Generates an infinite sequence of random numbers within the given range.
+    member this.GetValues(minValue, maxValue) =
+        Seq.initInfinite (fun _ -> this.Next(minValue, maxValue))
+
 let checker = FSharpChecker.Create(keepAssemblyContents=true)
 /// Get untyped tree for a specified input
 let getUntypedTree(file, input) = 
@@ -65,6 +71,32 @@ let result = add 1 2 3
       let input = """let add x y = x + y 
 let result = add 1
     """
+      // get implementation file contents (typed tree)
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let inputStringArray = input.Split "\n"
+      // printfn "TESTING "
+      // for x in inputStringArray do
+      //   printfn "string is %s" x
+      // printfn "TESTING "
+      // get untyped tree
+      let tree = getUntypedTree(file, input) 
+      // printfn "tree = %A" tree
+      // mockIncorrectParamAnalyser tree
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = IncorrectParameters mockContext
+      Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
+
+    }
+    test "Generating test cases" {
+      let input = """let add x y = x + y 
+let result = add 1
+    """
+      let inputStringArray = input.Split "\n"
+      let r = System.Random()
+      let nums = r.Next(1, 10)
+      // let nums = r.GetValues(1, 1000) |> Seq.take 1
+      printfn "obtained a random number %A" nums
       // get implementation file contents (typed tree)
       let checkProjectResults = parseAndCheckSingleFile(input)
       let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
