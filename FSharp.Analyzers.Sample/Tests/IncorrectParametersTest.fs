@@ -47,7 +47,7 @@ let parseAndCheckSingleFile (input) =
 
 [<Tests>]  
 let tests =
-  testList "Too Many Parameters test" [
+  testList "Parameter analyser test" [
     test "Default Case TooMany Parameters" {
       let input = """let add x y = x + y 
 let result = add 1 2 3
@@ -87,47 +87,40 @@ let result = add 1
       Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
 
     }
-    test "Generating test cases" {
-      let input = """let add x y = x + y 
-let result = add 1
-    """
-      let firstInput = "let add x y = x + y \n"
-      let secondInput nums = 
+    test "Statistical test cases" {
+      let firstInput = "let add x y = x + y"
+      let GenerateInput firstInput nums = 
         let s = "let result = add"    
         let mutable addon = ""
         for i in 1..nums do
           addon <- addon + " 1"
-        s + addon
+        firstInput + "\n" + s + addon + "\n"
+      let runInputWithAnalyser input = 
+        let checkProjectResults = parseAndCheckSingleFile(input)
+        let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+        let inputStringArray = input.Split "\n"
+        let tree = getUntypedTree(file, input) 
+        let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+        IncorrectParameters mockContext
       
-      let inputStringArray = input.Split "\n"
-      printfn " test %O " inputStringArray.[1]
-
       // generate random number to insert parameter
-      let r = System.Random()
-      let nums = r.Next(1, 10)
-      let secondLine = secondInput nums
-      printfn "Second input %A"  secondLine
-      // let nums = r.GetValues(1, 1000) |> Seq.take 1
-      printfn "obtained a random number %A" nums
-      
-
-
-      // get implementation file contents (typed tree)
-      let checkProjectResults = parseAndCheckSingleFile(input)
-      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
-      let inputStringArray = input.Split "\n"
-      // printfn "TESTING "
-      // for x in inputStringArray do
-      //   printfn "string is %s" x
-      // printfn "TESTING "
-      // get untyped tree
-      let tree = getUntypedTree(file, input) 
-      // printfn "tree = %A" tree
-      // mockIncorrectParamAnalyser tree
-      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
-      let result = IncorrectParameters mockContext
-      Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
-
+      for i in 1..10 do
+        let r = System.Random()
+        let nums = r.Next(1, 10)
+        let input = GenerateInput firstInput nums
+        printfn "obtained a random number %A" nums
+        printfn "Input %A"  input
+        let result = runInputWithAnalyser input
+        if nums >2 then 
+          let expectedResultMessage= "For function add, which expects 2 arguments "
+          let rangeResult = result.[0].Range
+          let expectedRange = "(2,13--2,18)"
+          Expect.equal  (rangeResult.ToShortString()) expectedRange "For code that exceeds parameters"
+          Expect.equal (result.[0].Message) expectedResultMessage "For code that exceeds parameters"
+          printfn "Correct range "
+        else 
+          Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
+          printfn "no output for correct code"
     }
 
   ]
