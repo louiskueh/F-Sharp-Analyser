@@ -53,7 +53,6 @@ let tests =
 let result = add 1 2 3
     """
       let inputStringArray = input.Split "\n"
-
       // get implementation file contents (typed tree)
       let checkProjectResults = parseAndCheckSingleFile(input)
       let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
@@ -92,11 +91,27 @@ let result = add 1
       let input = """let add x y = x + y 
 let result = add 1
     """
+      let firstInput = "let add x y = x + y \n"
+      let secondInput nums = 
+        let s = "let result = add"    
+        let mutable addon = ""
+        for i in 1..nums do
+          addon <- addon + " 1"
+        s + addon
+      
       let inputStringArray = input.Split "\n"
+      printfn " test %O " inputStringArray.[1]
+
+      // generate random number to insert parameter
       let r = System.Random()
       let nums = r.Next(1, 10)
+      let secondLine = secondInput nums
+      printfn "Second input %A"  secondLine
       // let nums = r.GetValues(1, 1000) |> Seq.take 1
       printfn "obtained a random number %A" nums
+      
+
+
       // get implementation file contents (typed tree)
       let checkProjectResults = parseAndCheckSingleFile(input)
       let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
