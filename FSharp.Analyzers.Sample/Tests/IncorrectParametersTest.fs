@@ -108,8 +108,8 @@ let result = add 1
         let r = System.Random()
         let nums = r.Next(1, 10)
         let input = GenerateInput firstInput nums
-        printfn "obtained a random number %A" nums
-        printfn "Input %A"  input
+        // printfn "obtained a random number %A" nums
+        // printfn "Input %A"  input
         let result = runInputWithAnalyser input
         if nums >2 then 
           let expectedResultMessage= "For function add, which expects 2 arguments "
@@ -117,10 +117,10 @@ let result = add 1
           let expectedRange = "(2,13--2,18)"
           Expect.equal  (rangeResult.ToShortString()) expectedRange "For code that exceeds parameters"
           Expect.equal (result.[0].Message) expectedResultMessage "For code that exceeds parameters"
-          printfn "Correct range "
+          // printfn "Correct range "
         else 
-          Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
-          printfn "no output for correct code"
+          Expect.equal result.IsEmpty  true  "Should not have any output for correct code"
+          // printfn "no output for correct code"
     }
 
   ]
