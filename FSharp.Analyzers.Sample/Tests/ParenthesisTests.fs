@@ -63,7 +63,24 @@ let peek stack =
     x
 let EMPTY = StackContents []
 
-let isBalanced str = 
+// let isBalanced str = 
+//     let rec loop xs stack = 
+//         match (xs, stack) with
+//         // find (, add ( to stack
+//         | '(' :: ys,  stack -> loop ys ('(' :: stack)
+//         // find ), and (  is already on top
+//         | ')' :: ys, '(' :: stack -> loop ys stack
+//         // find ), and ( is not on top, therefore error
+//         | ')' :: _, _ -> false
+//         // any other character loop
+//         | _ :: ys, stack -> loop ys stack
+//         // both empty then fine
+//         | [], [] -> true
+//         // empty line and stack is non empty
+//         | [], _ -> false
+    // loop (Seq.toList str) []
+
+let isBalanced str previousStack= 
     let rec loop xs stack = 
         match (xs, stack) with
         // find (, add ( to stack
@@ -71,14 +88,14 @@ let isBalanced str =
         // find ), and (  is already on top
         | ')' :: ys, '(' :: stack -> loop ys stack
         // find ), and ( is not on top, therefore error
-        | ')' :: _, _ -> false
+        | ')' :: _, _ -> (false,stack)
         // any other character loop
         | _ :: ys, stack -> loop ys stack
         // both empty then fine
-        | [], [] -> true
+        | [], [] -> (true,stack)
         // empty line and stack is non empty
-        | [], _ -> false
-    loop (Seq.toList str) []
+        | [], _ -> (false,stack)
+    loop (Seq.toList str) previousStack
 [<Tests>]  
 let tests =
   testList "Parenthesis analyser test" [
@@ -89,20 +106,28 @@ let tests =
   "    |> ResExpr (fun _ e -> e)
 "; "    |> ResCheckDone
 ";
-  "    |> Result.Bind fun (_,exp) ->
+  "    |> Result.Bind fun ((_,exp) ->
 "; "        eval ls.SymTab expr
 ";
   "    |> Result.map snd 
 "; "     
 "; "let hello = 1 "|]
 
-      let mutable newStack = StackContents []
-      let mutable s = ""
-      contents |> Seq.iter (fun line -> s<- s+ line)
-      printfn "Total is %s" s
-      let res = isBalanced s
-      printfn "%A" res
-
+      // let mutable newStack = StackContents []
+      // let mutable s = ""
+      // contents |> Seq.iter (fun line -> s<- s+ line)
+      // printfn "Total is %s" s
+      // let res = isBalanced s
+      // printfn "%A" res
+      let mutable trackStack =  []
+      for i in 0..contents.Length do
+        printfn "Line Content %d %s" i contents.[i]
+        let (balanced,tempStack)= isBalanced contents.[i] trackStack
+        trackStack <- tempStack
+        if balanced = false then do 
+          printfn "Found bracket error at line %d" i
+        else if balanced = true then do 
+          printfn "Expression is balanced"
     //   line |> Seq.iter (fun char ->
     //     match char with 
     //     | '(' -> 
