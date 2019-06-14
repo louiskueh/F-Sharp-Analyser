@@ -34,7 +34,7 @@ where `-p  --project <PROJECT> The project to use.
 * use ionide 3.33 and disable auto updating 
 * requries fsharp.analysers.sdk 0.0.1,  0.0.4 doesn't work
 Check ```netcoreapp2.2``` in fsproj matches your netsdk installed.
-
+* Analyser module not found -> check module name matches analyser function
 Check Fsharp language server logs and read info
 * paket direcotry name/volume label syntax incorrect - obj/debug delete nuspec files
 # example context info

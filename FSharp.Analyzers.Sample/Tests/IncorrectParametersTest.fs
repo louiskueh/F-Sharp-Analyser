@@ -1,4 +1,4 @@
-module Tests
+module ParameterTests
 open System.IO
 open Expecto
 open FSharp.Analyzers.SDK
@@ -7,11 +7,6 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.Range
 
-//Random gen
-type System.Random with
-    /// Generates an infinite sequence of random numbers within the given range.
-    member this.GetValues(minValue, maxValue) =
-        Seq.initInfinite (fun _ -> this.Next(minValue, maxValue))
 
 let checker = FSharpChecker.Create(keepAssemblyContents=true)
 /// Get untyped tree for a specified input

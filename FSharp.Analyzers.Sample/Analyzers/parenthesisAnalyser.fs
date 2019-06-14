@@ -1,4 +1,4 @@
-module SampleAnalyzer
+module ParenthesisAnalyser
 
 open FSharp.Analyzers.SDK
 // open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -10,9 +10,13 @@ let rec visitExpression handler=
     function 
     | SynExpr.Paren(expr, lParen, rParen, rangeInclParen) -> 
         match expr with 
+        // matches starting (  and then error
         | SynExpr.FromParseError(expr, range) ->
            handler range expr
         | _ -> ()
+    | SynExpr.FromParseError(expr,range) ->
+        printfn "Detected parse error with expr %A and range %A " expr range
+        visitExpression handler expr
     | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, m) -> 
         visitExpression handler funcExpr
         visitExpression handler argExpr
@@ -39,8 +43,8 @@ let visitModulesAndNamespaces handler modulesOrNss =
 
 
 [<Analyzer>]
-let paranthesis : Analyzer =
-    printfn "Inside custom analyzer!"
+let ParenthesisAnalyser : Analyzer =
+    printfn "Inside Parenthesis analyzer!"
     
     fun ctx ->
         printfn "ctx %A" ctx.Content
@@ -59,7 +63,6 @@ let paranthesis : Analyzer =
             modules |>  List.iter (visitModulesAndNamespaces handler)
             // visitModulesAndNamespaces modules
         | _ -> failwith "F# Interface file (*.fsi) not supported."
-        // parseTree.
         state
         |> Seq.map (fun r ->
             { Type = "Parenthesis Analyser"
