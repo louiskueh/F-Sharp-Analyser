@@ -6,39 +6,22 @@ open Microsoft.FSharp.Compiler.Range
 open Microsoft.FSharp.Compiler.Ast
 
 
-let rec visitExpression handler= 
-    function 
-    | SynExpr.Paren(expr, lParen, rParen, rangeInclParen) -> 
-        match expr with 
-        // matches starting (  and then error
-        | SynExpr.FromParseError(expr, range) ->
-           handler range expr
-        | _ -> ()
-    | SynExpr.FromParseError(expr,range) ->
-        printfn "Detected parse error with expr %A and range %A " expr range
-        visitExpression handler expr
-    | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, m) -> 
-        visitExpression handler funcExpr
-        visitExpression handler argExpr
-    | _ -> ()
-        
-
-
-let visitDeclarations handler decls = 
-    for declaration in decls do
-        match declaration with
-        | SynModuleDecl.Let(isRec, bindings, range) -> 
-            for binding in bindings do
-                let (Binding(access, kind, inlin, mutabl, attrs, xmlDoc, data, 
-                             pat, retInfo, body, m, sp)) = binding
-                visitExpression handler body
-        | _ -> ()
-
-let visitModulesAndNamespaces handler modulesOrNss = 
-    let (SynModuleOrNamespace(lid, isRec, isMod, decls, xml, attrs, _, m)) = 
-        modulesOrNss
-    visitDeclarations handler decls
-
+let isBalanced str previousStack= 
+    let rec loop xs stack = 
+        match (xs, stack) with
+        // find (, add ( to stack
+        | '(' :: ys,  stack -> loop ys ('(' :: stack)
+        // find ), and (  is already on top
+        | ')' :: ys, '(' :: stack -> loop ys stack
+        // find ), and ( is not on top, therefore error
+        | ')' :: _, _ -> (false,stack)
+        // any other character loop
+        | _ :: ys, stack -> loop ys stack
+        // both empty then fine
+        | [], [] -> (true,stack)
+        // empty line and stack is non empty
+        | [], _ -> (false,stack)
+    loop (Seq.toList str) previousStack
 
 
 
@@ -47,30 +30,47 @@ let ParenthesisAnalyser : Analyzer =
     printfn "Inside Parenthesis analyzer!"
     
     fun ctx ->
-        printfn "ctx %A" ctx.Content
-        let state = ResizeArray<range>()
-        // handler adds the range to display
-        let handler (range: range) (m: SynExpr) =
-            printfn "###################################"
-            printfn "SynExpr type %A" m
-            printfn "###################################"
-            state.Add range
-        let parseTree = ctx.ParseTree
-        match parseTree with
-        | ParsedInput.ImplFile(implFile) ->
-            // Extract declarations and walk over them
-            let (ParsedImplFileInput(fn, script, name, _, _, modules, _)) = implFile
-            modules |>  List.iter (visitModulesAndNamespaces handler)
-            // visitModulesAndNamespaces modules
-        | _ -> failwith "F# Interface file (*.fsi) not supported."
-        state
-        |> Seq.map (fun r ->
-            { Type = "Parenthesis Analyser"
-              Message = "Possible bracket error"
-              Code = "P001"
-              Severity = Warning
-              Range = r
-              Fixes = []}
-
-        )
-        |> Seq.toList
+      printfn "RUNNING ANALYSER"
+      let state = ResizeArray<range>()
+      // printfn "ctx %A" ctx.Content
+      let contents = ctx.Content
+      let mutable trackStack =  []
+      let mutable trackBalance = true
+      
+      for i in 0..contents.Length-1 do
+        printfn "Lenght of contents %d" contents.Length
+        printfn "i is %d" i
+        if trackBalance = true then do 
+        // printfn "trackBalance start %b %d" trackBalance 
+            let (balanced,tempStack)= isBalanced contents.[i] trackStack
+            printfn "Line Content %d %s is   " i contents.[i] 
+            trackStack <- tempStack
+            trackBalance <- balanced
+            if balanced = false then do 
+              printfn "Found bracket error at line %d" i
+              let Startposition = mkPos (i+1) 0
+              let EndPosition = mkPos (i+1) contents.[i].Length
+              let range = mkRange ctx.FileName Startposition EndPosition
+              state.Add range
+              printfn "state is (Inside loop) %A" state
+              printfn "Added range %A" range
+            else  
+              printfn "state is (Outside loop) %A" state
+              // printfn "Expression is balanced"
+      printfn "Finish loop"
+      // if state.ToArray().Length > 0 then do
+      //   printfn "state exists"
+      // else  
+      //   printfn "state doesn't exists"
+      
+      
+      state
+      |> Seq.map (fun r ->
+          { Type = "Parenthesis Analyser"
+            Message = "Possible bracket error"
+            Code = "P001"
+            Severity = Warning
+            Range = r
+            Fixes = []}
+      )
+      |> Seq.toList

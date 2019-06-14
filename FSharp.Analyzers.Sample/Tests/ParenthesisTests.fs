@@ -126,6 +126,10 @@ let tests =
         trackStack <- tempStack
         if balanced = false then do 
           printfn "Found bracket error at line %d" i
+          let Startposition = mkPos i 0
+          let EndPosition = mkPos i 5
+          let range = mkRange "myFile" Startposition EndPosition
+          printfn "Added range %A" range
         else if balanced = true then do 
           printfn "Expression is balanced"
     //   line |> Seq.iter (fun char ->
