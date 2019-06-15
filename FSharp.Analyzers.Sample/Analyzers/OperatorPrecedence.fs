@@ -7,6 +7,11 @@ open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.Range
 open System.IO
+open Expecto.Logging
+
+let mutable functionNames = Map.empty
+
+
 
 
 let rec visitExpression handler body= 
@@ -15,15 +20,27 @@ let rec visitExpression handler body=
         // printfn "In APP with funcExpr %A | argExpr %A" funcExpr argExpr
         match funcExpr with 
         | SynExpr.Ident(name) -> 
-            printfn "name of function call: %A" name
+            // printfn "name of function call: %A" name
+            let containsKey = (Map.containsKey (name.ToString()) functionNames)
+            // printfn "Checking %A exists with function names: %A " name containsKey
+            if containsKey then
+                // let mutable count = 0
+                // countArg body &count  
+                let res = (functionNames.TryFind (name.ToString()))
+                let mutable numArgs = 0
+                match res with
+                    | Some y -> (numArgs <- y)
+                    | None -> ()
+                // printfn "num args %d" numArgs
+                handler range (name.ToString()) numArgs
         | _ -> ()
         visitExpression handler funcExpr
         visitExpression handler argExpr
-    | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->
-        printfn "Let isUse %A" isUse
-        printfn "Bindings %A" bindings
-        printfn "Body %A" body
-        printfn "range %A" range
+    | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->()
+        // printfn "Let isUse %A" isUse
+        // printfn "Bindings %A" bindings
+        // printfn "Body %A" body
+        // printfn "range %A" range
 
     | x -> ()
     // printfn "unmatched! %A " x
@@ -36,28 +53,30 @@ let visitSynVal (x:SynValData) =
         // printfn "SynvalInfo %A" synvalInfo
         match synvalInfo with
         | SynValInfo (curriedArgsInfo, returninfo) ->
-            printfn "curriedArgsInfo"  
-            printfn "There are %d args" curriedArgsInfo.Length
-            for arg in curriedArgsInfo do
-                printfn "args %A" arg
+            // printfn "curriedArgsInfo"  
+            // printfn "There are %d args" curriedArgsInfo.Length
+            // for arg in curriedArgsInfo do
+            //     printfn "args %A" arg
             curriedArgsInfo.Length
             // printfn "returnInfo %A" returninfo
         // printfn "indentOption %A" indentOption
     
 let rec visitPattern pat data = 
     match pat with
-    | SynPat.Wild(x) -> printfn "  .. underscore pattern"
+    | SynPat.Wild(x) -> () 
+    // printfn "  .. underscore pattern"
     | SynPat.Named(pat, name, _, _, _) ->   
         visitPattern pat data
-        printfn "  .. named as '%s'" name.idText
+        // printfn "  .. named as '%s'" name.idText
         // This is for let result =.. -> result
     | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
         let names = 
             String.concat "." [for i in ident -> i.idText]
-        printfn "  .. identifier: %s" names
+        // printfn "  .. identifier: %s" names
         // identifier is name of function call 
         // let add x y =... -> add
         let numArgs = visitSynVal data
+        functionNames <- functionNames.Add(names,numArgs)
         ()
     | _ -> ()
 
@@ -68,19 +87,19 @@ let visitDeclarations handler decls =
             for binding in bindings do
                 let (Binding(access, kind, inlin, mutabl, attrs, xmlDoc, data, 
                              pat, retInfo, body, m, sp)) = binding
-                printfn "################# \n"
+                // printfn "################# \n"
                 // visitSynVal data
                 // // printfn "SynVal data : %A" data
                 // visitPattern pat \
                 visitPattern pat data
                 visitExpression handler body
-                printfn "################# \n"
+                // printfn "################# \n"
         | _ -> ()
 
 let visitModulesAndNamespaces handler modulesOrNss = 
     let (SynModuleOrNamespace(lid, isRec, isMod, decls, xml, attrs, _, m)) = 
         modulesOrNss
-    printfn "Namespace or module: %A" lid
+    // printfn "Namespace or module: %A" lid
     visitDeclarations handler decls
 
 let checker = FSharpChecker.Create(keepAssemblyContents=true)
@@ -97,38 +116,64 @@ let parseAndCheckSingleFile (input) =
     checker.ParseAndCheckProject (fprojOptions)
     |> Async.RunSynchronously
 
+let checkPrefix str previousStack= 
+    let rec loop xs stack = 
+        match (xs, stack) with
+        // find prefixes, add to stack
+        | '+' :: ys,  stack -> loop ys ('+' :: stack)
+        | '-' :: ys,  stack -> loop ys ('-' :: stack)
+        // if we get a +, followed by a space, continue
+        | ' ' :: ys, '+' :: stack -> loop ys stack
+        | ' ':: ys, '-' :: stack -> loop ys stack
+        // if there is no space between them possible error
+        | c :: _, '+' :: stack -> (false,(c,'+'))
+        | c :: _, '-' :: stack -> (false,(c,'-'))
+        // any other character loop
+        | _ :: ys, stack -> loop ys stack
+        // both empty then fine
+        | [], [] -> (true,(' ',' '))
+        // empty, and possible continue to next line?
+        | [], _ -> (false,(' ',' '))
+    loop (Seq.toList str) previousStack
+
+
 [<Analyzer>]
-let OperatorPrecedence : Analyzer  =
-    printfn "Inside OperatorPrecedence!"
+let IncorrectParameters : Analyzer  =
     fun ctx ->
-        printfn "ctx %A" ctx
-        let state = ResizeArray<range>()
+        let contents = ctx.Content
+        // printfn "ctx %A" ctx.ParseTree
+        let state = ResizeArray<(range *char * char)>()
         let string = ctx.Content |> String.concat "\n"
         let checkProjectResults = parseAndCheckSingleFile(string)
         // printfn "Errors: %A" checkProjectResults.Errors
+        let mutable FunctionName = ""
+        let mutable ExpectedArguments = 0
+        
         if checkProjectResults.Errors.Length > 0 then
-            // handler adds the range to display
-            let handler (range: range) functionName expectedArguments = 
-                // printfn "###################################"
-                // printfn "SynExpr type %A" m
-                // printfn "###################################"
-
-                state.Add range
-            let parseTree = ctx.ParseTree
-            match parseTree with
-            | ParsedInput.ImplFile(implFile) ->
-                // Extract declarations and walk over them
-                let (ParsedImplFileInput(fn, script, name, _, _, modules, _)) = implFile
-                modules |>  List.iter (visitModulesAndNamespaces handler)
-            | _ -> failwith "F# Interface file (*.fsi) not supported."
+            for error in checkProjectResults.Errors do 
+                printfn "Errors %A " error
+                printfn "Error line: %A - %A " error.StartLineAlternate error.EndLineAlternate
+                if error.Message = "This value is not a function and cannot be applied." then do 
+                    // check for prefixes here
+                    if error.StartLineAlternate = error.EndLineAlternate then do 
+                        let codeToCheck = contents.[error.StartLineAlternate - 1]
+                        let (result,(char,prefix)) = checkPrefix codeToCheck []
+                        if result = false then do 
+                            let Startposition = mkPos (error.StartLineAlternate) error.StartColumn
+                            let EndPosition = mkPos (error.EndLineAlternate) codeToCheck.Length
+                            let range = mkRange ctx.FileName Startposition EndPosition
+                            state.Add (range,char,prefix)
+                            printfn "Result = %A, if false there is no space between + / - error! " result
+                    
+        printfn "State is %A" state
 
         state
-        |> Seq.map (fun r ->
-            { Type = "Possibly wrong number of parameters"
-              Message = "For function "
+        |> Seq.map (fun (range,char,prefix) ->
+            { Type = "Possibly no spacing between prefixes! \n"
+              Message = "Try adding a space between " +  prefix.ToString()  + " and " + char.ToString()
               Code = "P001"
               Severity = Warning
-              Range = r
+              Range = range
               Fixes = []}
 
         )
