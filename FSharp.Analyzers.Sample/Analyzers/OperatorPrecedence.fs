@@ -131,7 +131,7 @@ let checkFunctionCalled (line:string)  =
 
 // check Function Names
 let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorInfo)  = 
-    printfn "error %A " (error.ToString())
+    // printfn "error %A " (error.ToString())
     let contents = ctx.Content
     // if error is on one line
     if error.StartLineAlternate = error.EndLineAlternate then do 
