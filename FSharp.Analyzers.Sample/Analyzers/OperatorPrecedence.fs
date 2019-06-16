@@ -103,7 +103,7 @@ let checkPrefix str previousStack=
         | [], _ -> (false,(' ',' '))
     loop (Seq.toList str) previousStack
 
-let checkPrefixSpacing (ctx:Context) (state:ResizeArray<(range *char * char)>) (error:FSharpErrorInfo) =
+let checkPrefixSpacing (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorInfo) =
     // printfn "Errors %A " error
     // printfn "Error line: %A - %A " error.StartLineAlternate error.EndLineAlternate
     let contents = ctx.Content
@@ -117,11 +117,10 @@ let checkPrefixSpacing (ctx:Context) (state:ResizeArray<(range *char * char)>) (
                 let EndPosition = mkPos (error.EndLineAlternate) codeToCheck.Length
                 let range = mkRange ctx.FileName Startposition EndPosition
                 // printfn "Result = %A, if false there is no space between + / - error! " result    
-                state.Add (range,char,prefix)
+                state.Add (range,"Try adding a space between " +  prefix.ToString()  + " and " + char.ToString())
                 // printfn "added to state"
 
-
-
+// Iterate through function names and see if code contains them
 let checkFunctionCalled (line:string)  = 
     let result= ResizeArray<string>()
     Set.iter  (fun name -> 
@@ -129,7 +128,9 @@ let checkFunctionCalled (line:string)  =
             result.Add name
     ) functionNames
     result
-let main (ctx:Context) (state:ResizeArray<(range *char * char)>) (error:FSharpErrorInfo)  = 
+
+// check Function Names
+let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorInfo)  = 
     printfn "error %A " (error.ToString())
     let contents = ctx.Content
     // if error is on one line
@@ -138,10 +139,18 @@ let main (ctx:Context) (state:ResizeArray<(range *char * char)>) (error:FSharpEr
         // check if function name is called
         let functionCallNames = checkFunctionCalled codeToCheck
         if functionCallNames.Count > 0 then do 
-            printfn "Found same names, they are %A" functionCallNames
+            printfn "Found function calls, they are %A" functionCallNames
+            // if contains plus most likely operator error
+            if codeToCheck.Contains("+") then 
+                let possibleFunctionCalls = String.concat "." [for i in functionCallNames -> i]
+                let Startposition = mkPos (error.StartLineAlternate) error.StartColumn
+                let EndPosition = mkPos (error.EndLineAlternate) error.EndColumn
+                let range = mkRange ctx.FileName Startposition EndPosition
+                state.Add (range,"The arguments for function \"" + possibleFunctionCalls   + "\" may need brackets near character: \"" + "+\"")
+                printfn "Found +, added to state"
+
         else
-            printfn "Found no function calls, doing prefix"
-            // if not called check spacing
+            printfn "Found no function calls, doing prefix check"
             checkPrefixSpacing ctx state error
     
     
@@ -152,13 +161,12 @@ let IncorrectParameters : Analyzer  =
     fun ctx ->
         // printfn "ctxParseTree %A" ctx.ParseTree
         // printfn "ctxTypedTree  %A" ctx.TypedTree 
-        let state = ResizeArray<(range *char * char)>()
+        let state = ResizeArray<(range *string)>()
         let string = ctx.Content |> String.concat "\n"
         let checkProjectResults = parseAndCheckSingleFile(string)
         // printfn "Errors: %A" checkProjectResults.Errors
         
         if checkProjectResults.Errors.Length > 0 then
-            // Iterate and add function names
             match ctx.ParseTree with
             | ParsedInput.ImplFile(implFile) ->
                 // Extract declarations and walk over them
@@ -166,17 +174,17 @@ let IncorrectParameters : Analyzer  =
                 modules |>  List.iter (visitModulesAndNamespaces ())
             | _ -> failwith "F# Interface file (*.fsi) not supported."
             printfn "Function names found are %A " functionNames
-
+            printfn "Number of errors %d" checkProjectResults.Errors.Length
             // check prefix errors
             // checkProjectResults.Errors |> Array.iter (fun error -> checkPrefixSpacing ctx state error ) 
             checkProjectResults.Errors |> Array.iter (main ctx state)
                     
-        // printfn "State is %A" state
+        printfn "State is %A" state
 
         state
-        |> Seq.map (fun (range,char,prefix) ->
-            { Type = "Possibly no spacing between prefixes! \n"
-              Message = "Try adding a space between " +  prefix.ToString()  + " and " + char.ToString()
+        |> Seq.map (fun (range,message) ->
+            { Type = "Possible error with prefixes and operator precedence! "
+              Message = message
               Code = "P001"
               Severity = Warning
               Range = range
