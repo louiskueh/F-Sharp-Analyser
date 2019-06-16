@@ -43,7 +43,7 @@ let parseAndCheckSingleFile (input) =
 [<Tests>]  
 let tests =
   testList "Operator Precedence test" [
-    test "Default Case Infix test" {
+    test "+ Case Infix test" {
       let input = """let result = 1 +3
     """
       // Generate Mock context for source code
@@ -56,6 +56,25 @@ let tests =
       let result = OperatorPrecedence mockContext
       printfn "Result is %A" result
       let expectedResult = "Try adding a space between + and 3"
+      let Startposition = mkPos (1) 13
+      let EndPosition = mkPos (1) 18
+      let range = mkRange "" Startposition EndPosition
+      // Expect.equal result.[0].Range 
+      Expect.equal result.[0].Message expectedResult "Expected Message should match"
+    }
+    test "- Case Infix test" {
+      let input = """let x = 1 -2
+    """
+      // Generate Mock context for source code
+      let inputStringArray = input.Split "\n"
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let tree = getUntypedTree(file, input) 
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+
+      let result = OperatorPrecedence mockContext
+      printfn "Result is %A" result
+      let expectedResult = "Try adding a space between - and 2"
       let Startposition = mkPos (1) 13
       let EndPosition = mkPos (1) 18
       let range = mkRange "" Startposition EndPosition

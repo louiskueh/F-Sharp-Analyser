@@ -147,10 +147,10 @@ let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorI
                 let EndPosition = mkPos (error.EndLineAlternate) error.EndColumn
                 let range = mkRange ctx.FileName Startposition EndPosition
                 state.Add (range,"The arguments for function \"" + possibleFunctionCalls   + "\" may need brackets to define arguments near character: \"" + "+\"")
-                printfn "Found +, added to state"
+                // printfn "Found +, added to state"
 
         else
-            printfn "Found no function calls, doing prefix check"
+            // printfn "Found no function calls, doing prefix check"
             checkPrefixSpacing ctx state error
     
     
@@ -173,13 +173,13 @@ let OperatorPrecedence : Analyzer  =
                 let (ParsedImplFileInput(fn, script, name, _, _, modules, _)) = implFile
                 modules |>  List.iter (visitModulesAndNamespaces ())
             | _ -> failwith "F# Interface file (*.fsi) not supported."
-            printfn "Function names found are %A " functionNames
-            printfn "Number of errors %d" checkProjectResults.Errors.Length
+            // printfn "Function names found are %A " functionNames
+            // printfn "Number of errors %d" checkProjectResults.Errors.Length
             // check prefix errors
             // checkProjectResults.Errors |> Array.iter (fun error -> checkPrefixSpacing ctx state error ) 
             checkProjectResults.Errors |> Array.iter (main ctx state)
                     
-        printfn "State is %A" state
+        // printfn "State is %A" state
         
         state
         |> Seq.map (fun (range,message) ->
