@@ -146,7 +146,7 @@ let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorI
                 let Startposition = mkPos (error.StartLineAlternate) error.StartColumn
                 let EndPosition = mkPos (error.EndLineAlternate) error.EndColumn
                 let range = mkRange ctx.FileName Startposition EndPosition
-                state.Add (range,"The arguments for function \"" + possibleFunctionCalls   + "\" may need brackets near character: \"" + "+\"")
+                state.Add (range,"The arguments for function \"" + possibleFunctionCalls   + "\" may need brackets to define arguments near character: \"" + "+\"")
                 printfn "Found +, added to state"
 
         else
@@ -180,7 +180,7 @@ let OperatorPrecedence : Analyzer  =
             checkProjectResults.Errors |> Array.iter (main ctx state)
                     
         printfn "State is %A" state
-
+        
         state
         |> Seq.map (fun (range,message) ->
             { Type = "Operator Precedence Analyser "
