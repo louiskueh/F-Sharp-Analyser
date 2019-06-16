@@ -157,7 +157,7 @@ let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorI
 
 
 [<Analyzer>]
-let IncorrectParameters : Analyzer  =
+let OperatorPrecedence : Analyzer  =
     fun ctx ->
         // printfn "ctxParseTree %A" ctx.ParseTree
         // printfn "ctxTypedTree  %A" ctx.TypedTree 
@@ -183,7 +183,7 @@ let IncorrectParameters : Analyzer  =
 
         state
         |> Seq.map (fun (range,message) ->
-            { Type = "Possible error with prefixes and operator precedence! "
+            { Type = "Operator Precedence Analyser "
               Message = message
               Code = "P001"
               Severity = Warning
