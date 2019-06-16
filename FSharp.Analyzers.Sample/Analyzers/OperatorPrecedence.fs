@@ -19,7 +19,7 @@ let rec visitExpression handler body=
             // printfn "Found name %A" (name.ToString())
         | SynExpr.LongIdent(op,ident,syn,range)->
             let names = String.concat "." [for i in ident.Lid -> i.idText]
-            printfn "LongIdent %A " names
+            // printfn "LongIdent %A " names
             functionNames <- functionNames.Add(names)
         | _ -> ()
         visitExpression handler funcExpr
@@ -30,7 +30,7 @@ let rec visitExpression handler body=
         // printfn "Body %A" body
         // printfn "range %A" range
 
-    | x -> ()
+    | _ -> ()
 
 
 let rec visitPattern pat data = 
@@ -44,7 +44,6 @@ let rec visitPattern pat data =
     | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
         let names = 
             String.concat "." [for i in ident -> i.idText]
-        printfn "  .. identifier: %s" names
         // identifier is name of function call 
         // let add x y =... -> add
         
@@ -68,7 +67,6 @@ let visitDeclarations handler decls =
 let visitModulesAndNamespaces handler modulesOrNss = 
     let (SynModuleOrNamespace(lid, isRec, isMod, decls, xml, attrs, _, m)) = 
         modulesOrNss
-    printfn "Namespace or module: %A" lid
     visitDeclarations handler decls
 
 let checker = FSharpChecker.Create(keepAssemblyContents=true)
@@ -121,18 +119,43 @@ let checkPrefixSpacing (ctx:Context) (state:ResizeArray<(range *char * char)>) (
                 // printfn "Result = %A, if false there is no space between + / - error! " result    
                 state.Add (range,char,prefix)
                 // printfn "added to state"
-           
-                
+
+
+
+let checkFunctionCalled (line:string)  = 
+    let result= ResizeArray<string>()
+    Set.iter  (fun name -> 
+        if line.Contains (name) then do 
+            result.Add name
+    ) functionNames
+    result
+let main (ctx:Context) (state:ResizeArray<(range *char * char)>) (error:FSharpErrorInfo)  = 
+    printfn "error %A " (error.ToString())
+    let contents = ctx.Content
+    // if error is on one line
+    if error.StartLineAlternate = error.EndLineAlternate then do 
+        let codeToCheck = contents.[error.StartLineAlternate - 1]
+        // check if function name is called
+        let functionCallNames = checkFunctionCalled codeToCheck
+        if functionCallNames.Count > 0 then do 
+            printfn "Found same names, they are %A" functionCallNames
+        else
+            printfn "Found no function calls, doing prefix"
+            // if not called check spacing
+            checkPrefixSpacing ctx state error
+    
+    
+
+
 [<Analyzer>]
 let IncorrectParameters : Analyzer  =
     fun ctx ->
-        printfn "ctxParseTree %A" ctx.ParseTree
+        // printfn "ctxParseTree %A" ctx.ParseTree
         // printfn "ctxTypedTree  %A" ctx.TypedTree 
         let state = ResizeArray<(range *char * char)>()
         let string = ctx.Content |> String.concat "\n"
         let checkProjectResults = parseAndCheckSingleFile(string)
         // printfn "Errors: %A" checkProjectResults.Errors
-        let mutable FunctionName = ""
         
         if checkProjectResults.Errors.Length > 0 then
             // Iterate and add function names
@@ -143,9 +166,10 @@ let IncorrectParameters : Analyzer  =
                 modules |>  List.iter (visitModulesAndNamespaces ())
             | _ -> failwith "F# Interface file (*.fsi) not supported."
             printfn "Function names found are %A " functionNames
+
             // check prefix errors
-            checkProjectResults.Errors |> Array.iter (fun error -> checkPrefixSpacing ctx state error ) 
-               
+            // checkProjectResults.Errors |> Array.iter (fun error -> checkPrefixSpacing ctx state error ) 
+            checkProjectResults.Errors |> Array.iter (main ctx state)
                     
         // printfn "State is %A" state
 
