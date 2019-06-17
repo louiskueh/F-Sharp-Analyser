@@ -1,3 +1,3 @@
 // let x = 1 -3  
-
-let res = String.length "hello" + "world" 
+let string = "s"
+let res = string + 8

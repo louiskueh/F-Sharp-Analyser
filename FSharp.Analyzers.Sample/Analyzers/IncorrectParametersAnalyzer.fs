@@ -132,6 +132,7 @@ let parseAndCheckSingleFile (input) =
 
 [<Analyzer>]
 let IncorrectParameters : Analyzer  =
+    functionNames <- Map.empty
     fun ctx ->
         // printfn "ctx %A" ctx.ParseTree
         let state = ResizeArray<range>()

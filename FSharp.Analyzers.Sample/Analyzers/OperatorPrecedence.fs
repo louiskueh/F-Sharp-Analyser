@@ -158,6 +158,7 @@ let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorI
 
 [<Analyzer>]
 let OperatorPrecedence : Analyzer  =
+    functionNames <- Set.empty
     fun ctx ->
         // printfn "ctxParseTree %A" ctx.ParseTree
         // printfn "ctxTypedTree  %A" ctx.TypedTree 
@@ -179,7 +180,7 @@ let OperatorPrecedence : Analyzer  =
             // checkProjectResults.Errors |> Array.iter (fun error -> checkPrefixSpacing ctx state error ) 
             checkProjectResults.Errors |> Array.iter (main ctx state)
                     
-        // printfn "State is %A" state
+        printfn "function names are %A" functionNames
         
         state
         |> Seq.map (fun (range,message) ->
