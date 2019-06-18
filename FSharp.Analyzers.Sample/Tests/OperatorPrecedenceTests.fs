@@ -115,27 +115,119 @@ let tests =
 //     Expect.equal result.[1].Range  ExpectedRange2 "Matching range"
 //     }
 
-    test "Multiple errors on a line" {
-    let input = """let result = 42 + [1..10] |> List.sum  +  String.length "hello" + "world"
+    test "Multiple errors on 2 different lines" {
+    let input = """let result = 42 + [1..10]|> List.sum
+let result2 = String.length "hello" + "world"
   """
     // Generate Mock context for source code
     let result = getResultFromInput input
-    printfn "result %A" result
+    let expectedMessage = "The arguments for function \"List.sum\" may need brackets to define arguments near character: \"+\""
+    let Startposition = mkPos (1) 18
+    let EndPosition = mkPos (1) 25
+    let ExpectedRange = mkRange "" Startposition EndPosition
+
+    let expectedMessage2 = "The arguments for function \"String.length\" may need brackets to define arguments near character: \"+\""
+    let Startposition = mkPos (2) 38
+    let EndPosition = mkPos (2) 45
+    let ExpectedRange2 = mkRange "" Startposition EndPosition
+    // printfn "result %A" result
+    Expect.equal result.Length 4 "Expected 4 errors"
+    Expect.equal result.[0].Message expectedMessage "Matching message"
+    Expect.equal result.[0].Range ExpectedRange "Range matches"
+    Expect.equal result.[2].Message expectedMessage2 "Matching Message"
+    Expect.equal result.[2].Range  ExpectedRange2 "Matching range"
+    }
+    test "One error with another correct statement" {
+    // Since the functions are called with the same name they are matched
+    let input = """let result = 42 + [1..10]|> List.sum
+let result2 = 5
+  """
+    // Generate Mock context for source code
+    let result = getResultFromInput input
     let expectedMessage = "The arguments for function \"List.sum\" may need brackets to define arguments near character: \"+\""
     let Startposition = mkPos (1) 18
     let EndPosition = mkPos (1) 25
     let ExpectedRange = mkRange "" Startposition EndPosition
 
     let expectedMessage2 = "The arguments for function \"List.sum\" may need brackets to define arguments near character: \"+\""
-    let Startposition = mkPos (1) 29
-    let EndPosition = mkPos (1) 37
+    let Startposition = mkPos (1) 28
+    let EndPosition = mkPos (1) 36
     let ExpectedRange2 = mkRange "" Startposition EndPosition
-    // printfn "result %A" result
-    Expect.equal result.Length 2 "Expected 2 errors"
+    printfn "result %A" result
+    Expect.equal result.Length 2 "Expected 4 errors"
     Expect.equal result.[0].Message expectedMessage "Matching message"
     Expect.equal result.[0].Range ExpectedRange "Range matches"
     Expect.equal result.[1].Message expectedMessage2 "Matching Message"
     Expect.equal result.[1].Range  ExpectedRange2 "Matching range"
+    }
+    test "Multiple errors with 1 correct line in between" {
+    let input = """let result = 42 + [1..10]|> List.sum
+let temp = 5 + 5
+let result2 = String.length "hello" + "world"
+  """
+    // Generate Mock context for source code
+    let result = getResultFromInput input
+    let expectedMessage = "The arguments for function \"List.sum\" may need brackets to define arguments near character: \"+\""
+    let Startposition = mkPos (1) 18
+    let EndPosition = mkPos (1) 25
+    let ExpectedRange = mkRange "" Startposition EndPosition
+
+    let expectedMessage2 = "The arguments for function \"String.length\" may need brackets to define arguments near character: \"+\""
+    let Startposition = mkPos (3) 38
+    let EndPosition = mkPos (3) 45
+    let ExpectedRange2 = mkRange "" Startposition EndPosition
+    // printfn "result %A" result
+    Expect.equal result.Length 4 "Expected 4 errors"
+    Expect.equal result.[0].Message expectedMessage "Matching message"
+    Expect.equal result.[0].Range ExpectedRange "Range matches"
+    Expect.equal result.[2].Message expectedMessage2 "Matching Message"
+    Expect.equal result.[2].Range  ExpectedRange2 "Matching range"
+    }
+//     test "Multiple errors with 1 correct line calling functions" {
+//     let input = """let result = 42 + [1..10]|> List.sum
+// let result2 = String.length "hello" + "world"
+// let temp = result + result2
+//   """
+//     // Generate Mock context for source code
+//     let result = getResultFromInput input
+//     let expectedMessage = "The arguments for function \"List.sum\" may need brackets to define arguments near character: \"+\""
+//     let Startposition = mkPos (1) 18
+//     let EndPosition = mkPos (1) 25
+//     let ExpectedRange = mkRange "" Startposition EndPosition
+
+//     let expectedMessage2 = "The arguments for function \"String.length\" may need brackets to define arguments near character: \"+\""
+//     let Startposition = mkPos (2) 38
+//     let EndPosition = mkPos (2) 45
+//     let ExpectedRange2 = mkRange "" Startposition EndPosition
+//     printfn "result %A" result
+//     Expect.equal result.Length 4 "Expected 4 errors"
+//     Expect.equal result.[0].Message expectedMessage "Matching message"
+//     Expect.equal result.[0].Range ExpectedRange "Range matches"
+//     Expect.equal result.[2].Message expectedMessage2 "Matching Message"
+//     Expect.equal result.[2].Range  ExpectedRange2 "Matching range"
+//     }
+    test "One error with function call on error function with the same name" {
+    // Since the functions are called with the same name they are matched
+    let input = """let result = 42 + [1..10]|> List.sum
+let result2 = result + 2
+  """
+    // Generate Mock context for source code
+    let result = getResultFromInput input
+    let expectedMessage = "The arguments for function \"List.sum\" may need brackets to define arguments near character: \"+\""
+    let Startposition = mkPos (1) 18
+    let EndPosition = mkPos (1) 25
+    let ExpectedRange = mkRange "" Startposition EndPosition
+
+    let expectedMessage2 = "The arguments for function \"String.length\" may need brackets to define arguments near character: \"+\""
+    let Startposition = mkPos (2) 38
+    let EndPosition = mkPos (2) 45
+    let ExpectedRange2 = mkRange "" Startposition EndPosition
+    printfn "result %A" result
+    Expect.equal result.Length 4 "Expected 4 errors"
+    Expect.equal result.[0].Message expectedMessage "Matching message"
+    Expect.equal result.[0].Range ExpectedRange "Range matches"
+    Expect.equal result.[2].Message expectedMessage2 "Matching Message"
+    Expect.equal result.[2].Range  ExpectedRange2 "Matching range"
     }
 
   ]

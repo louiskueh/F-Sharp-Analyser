@@ -147,7 +147,7 @@ let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorI
         // check if function name is called
         let functionCallNames = checkFunctionCalled codeToCheck
         if functionCallNames.Count > 0 then do 
-            printfn "Found function calls, they are %A" functionCallNames
+            printfn "Found function calls in line %d, they are %A" error.StartLineAlternate functionCallNames
             // if contains plus most likely operator error
             if codeToCheck.Contains("+") then 
                 let possibleFunctionCalls = String.concat "." [for i in functionCallNames -> i]
