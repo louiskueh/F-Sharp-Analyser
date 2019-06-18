@@ -168,7 +168,7 @@ let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorI
 let OperatorPrecedence : Analyzer  =
     functionNames <- Set.empty
     fun ctx ->
-        printfn "ctxParseTree %A" ctx.ParseTree
+        // printfn "ctxParseTree %A" ctx.ParseTree
         // printfn "ctxTypedTree  %A" ctx.TypedTree 
         let state = ResizeArray<(range *string)>()
         let string = ctx.Content |> String.concat "\n"

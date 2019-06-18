@@ -42,7 +42,7 @@ let parseAndCheckSingleFile (input) =
 
 [<Tests>]  
 let tests =
-  testList "Operator Precedence test" [
+  testList "Operator Precedence prefix tests" [
     test "Error + Case Infix test" {
       let input = """let result = 1 +3
     """
@@ -107,8 +107,9 @@ let tests =
       let result = OperatorPrecedence mockContext
       Expect.equal result  [] "No expected match for false positives"
     }
-    test "No error - Case Infix test" {
-      let input = """let x = 1 - 2
+
+    test " No Error + Infix test" {
+      let input = """let x = 1 - -2
     """
       // Generate Mock context for source code
       let inputStringArray = input.Split "\n"
@@ -119,8 +120,8 @@ let tests =
       let result = OperatorPrecedence mockContext
       Expect.equal result  [] "No expected match for false positives"
     }
-    test "Error + Infix test" {
-      let input = """let x = 1 - 2
+    test " No Error +- Infix test" {
+      let input = """let x = 1 - +2
     """
       // Generate Mock context for source code
       let inputStringArray = input.Split "\n"
@@ -131,6 +132,78 @@ let tests =
       let result = OperatorPrecedence mockContext
       Expect.equal result  [] "No expected match for false positives"
     }
+    test " No Error -+ Infix test" {
+      let input = """let x = 1 - +2
+    """
+      // Generate Mock context for source code
+      let inputStringArray = input.Split "\n"
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let tree = getUntypedTree(file, input) 
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = OperatorPrecedence mockContext
+      Expect.equal result  [] "Matching message"
+    }
+    test "Two errors on same line" {
+      let input = """let x = 1 -2 -3
+    """
+      // Generate Mock context for source code
+      let inputStringArray = input.Split "\n"
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let tree = getUntypedTree(file, input) 
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = OperatorPrecedence mockContext
+      printfn "result %A" result
+      Expect.equal result  [] "Matching message"
+    }
+    test "3 errors on same line" {
+      let input = """let x = 1 -2 - 3 +2
+    """
+      // Generate Mock context for source code
+      let inputStringArray = input.Split "\n"
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let tree = getUntypedTree(file, input) 
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = OperatorPrecedence mockContext
+      // printfn "result %A" result
+      Expect.equal result  [] "Matching message"
+    }
+    test "Error across multiple lines " {
+      let input = """let x = 1 \n
+      -2
+    """
+      // Generate Mock context for source code
+      let inputStringArray = input.Split "\n"
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let tree = getUntypedTree(file, input) 
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = OperatorPrecedence mockContext
+      // printfn "result %A" result
+      Expect.equal result  [] "Matching message"
+    }
+    test "Error in nested expression " {
+      let input = """let x = ( 1 + 5) * (6 * + 5 / 2 ) + 2 - 3 * 55 -3
+    """
+      // Generate Mock context for source code
+      let inputStringArray = input.Split "\n"
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let tree = getUntypedTree(file, input) 
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = OperatorPrecedence mockContext
+      // printfn "result %A" result
+      let expectedMessage = "Try adding a space between - and 3"
+      let Startposition = mkPos (1) 44
+      let EndPosition = mkPos (1) 50
+      let ExpectedRange = mkRange "" Startposition EndPosition
+      Expect.equal result.[0].Message expectedMessage "Matching message"
+      Expect.equal result.[0].Range ExpectedRange "Range matches"
+    }
+
+
 
 
 
