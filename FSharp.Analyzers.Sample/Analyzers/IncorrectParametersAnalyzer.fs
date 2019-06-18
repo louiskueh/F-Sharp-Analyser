@@ -81,7 +81,7 @@ let rec visitPattern pat data =
     // printfn "  .. underscore pattern"
     | SynPat.Named(pat, name, _, _, _) ->   
         visitPattern pat data
-        // printfn "  .. named as '%s'" name.idText
+        printfn "  .. named as '%s'" name.idText
         // This is for let result =.. -> result
     | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
         let names = 

@@ -1,3 +1,1 @@
-// let x = 1 -3  
-let string = "s"
-let res = string + 8
+let result = 42 + [1..10] |> List.sum 

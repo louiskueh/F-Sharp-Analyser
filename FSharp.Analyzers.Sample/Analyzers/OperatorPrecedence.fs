@@ -13,15 +13,15 @@ let rec visitExpression handler body=
     match body with
     | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) -> 
         // printfn "In APP with funcExpr %A | argExpr %A" funcExpr argExpr
-        match funcExpr with 
-        | SynExpr.Ident(name) -> 
-            functionNames <- functionNames.Add(name.ToString())
-            // printfn "Found name %A" (name.ToString())
-        | SynExpr.LongIdent(op,ident,syn,range)->
-            let names = String.concat "." [for i in ident.Lid -> i.idText]
-            // printfn "LongIdent %A " names
-            functionNames <- functionNames.Add(names)
-        | _ -> ()
+        // match funcExpr with 
+        // | SynExpr.Ident(name) -> 
+        //     functionNames <- functionNames.Add(name.ToString())
+        //     // printfn "Found name %A" (name.ToString())
+        // | SynExpr.LongIdent(op,ident,syn,range)->
+        //     let names = String.concat "." [for i in ident.Lid -> i.idText]
+        //     // printfn "LongIdent %A " names
+        //     functionNames <- functionNames.Add(names)
+        // | _ -> ()
         visitExpression handler funcExpr
         visitExpression handler argExpr
     | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->()
@@ -29,6 +29,13 @@ let rec visitExpression handler body=
         // printfn "Bindings %A" bindings
         // printfn "Body %A" body
         // printfn "range %A" range
+    | SynExpr.Ident(name) -> 
+        functionNames <- functionNames.Add(name.ToString())
+    // printfn "Found name %A" (name.ToString())
+    | SynExpr.LongIdent(op,ident,syn,range)->
+        let names = String.concat "." [for i in ident.Lid -> i.idText]
+        // printfn "LongIdent %A " names
+        functionNames <- functionNames.Add(names)
 
     | _ -> ()
 
@@ -44,6 +51,7 @@ let rec visitPattern pat data =
     | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
         let names = 
             String.concat "." [for i in ident -> i.idText]
+        functionNames <- functionNames.Add(names)
         // identifier is name of function call 
         // let add x y =... -> add
         
@@ -160,7 +168,7 @@ let main (ctx:Context) (state:ResizeArray<(range *string )>) (error:FSharpErrorI
 let OperatorPrecedence : Analyzer  =
     functionNames <- Set.empty
     fun ctx ->
-        // printfn "ctxParseTree %A" ctx.ParseTree
+        printfn "ctxParseTree %A" ctx.ParseTree
         // printfn "ctxTypedTree  %A" ctx.TypedTree 
         let state = ResizeArray<(range *string)>()
         let string = ctx.Content |> String.concat "\n"
