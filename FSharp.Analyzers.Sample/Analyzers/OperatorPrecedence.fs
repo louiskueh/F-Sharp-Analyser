@@ -188,7 +188,7 @@ let OperatorPrecedence : Analyzer  =
             // checkProjectResults.Errors |> Array.iter (fun error -> checkPrefixSpacing ctx state error ) 
             checkProjectResults.Errors |> Array.iter (main ctx state)
                     
-        printfn "function names are %A" functionNames
+        // printfn "function names are %A" functionNames
         
         state
         |> Seq.map (fun (range,message) ->
