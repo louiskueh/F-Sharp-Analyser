@@ -10,10 +10,10 @@
     <Version>1.0.2</Version>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Analyzers/IncorrectParametersAnalyzer.fs" />
+     <!-- <Compile Include="Analyzers/IncorrectParametersAnalyzer.fs" /> -->
     <!-- <Compile Include="Analyzers/OperatorPrecedence.fs" /> -->
     <!-- <Compile Include="ListFloatAnalyzer.fs" /> -->
-    <!-- <Compile Include="Analyzers/OperatorPrecedence.fs" /> -->
+    <Compile Include="Analyzers/OperatorPrecedence.fs" />
     <!-- <Compile Include="example.fs" /> -->
 
   </ItemGroup>

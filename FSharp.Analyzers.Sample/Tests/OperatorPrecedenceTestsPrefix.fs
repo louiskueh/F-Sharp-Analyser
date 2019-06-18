@@ -1,4 +1,4 @@
-module OperatorPrecedenceTests
+module OperatorPrecedencePrefixTests
 open System.IO
 open Expecto
 open FSharp.Analyzers.SDK
