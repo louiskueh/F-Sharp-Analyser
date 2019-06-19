@@ -1,8 +1,10 @@
 module traverse
 open Expecto
-
+open Expecto.TestResults
 [<EntryPoint>]
-let main argv =
+let main argv = 
     // Run tests
-    let test = Tests.runTestsInAssembly defaultConfig argv
-    0
+    let writeResults = TestResults.writeNUnitSummary ("TestResults.xml", "Expecto.Tests")
+    let config = defaultConfig.appendSummaryHandler writeResults
+    runTestsInAssembly config argv
+

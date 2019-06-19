@@ -1,3 +1,4 @@
 source https://api.nuget.org/v3/index.json
 nuget Expecto 8.10.1
+nuget Expecto.TestResults 8.10.1
 nuget FSharp.Analyzers.SDK 0.0.1
