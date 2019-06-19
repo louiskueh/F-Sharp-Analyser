@@ -6,7 +6,7 @@ open Microsoft.FSharp.Compiler.Range
 open Microsoft.FSharp.Compiler.Ast
 
 
-let isBalanced str previousStack= 
+let isBalanced str previousStack lastLine= 
     let rec loop xs stack = 
         match (xs, stack) with
         // find (, add ( to stack
@@ -20,7 +20,13 @@ let isBalanced str previousStack=
         // both empty then fine
         | [], [] -> (true,stack)
         // empty line and stack is non empty
-        | [], stack -> (false,stack)
+        | [], stack -> 
+          let mutable returnRes = (false,[])
+          if (lastLine = true) then do
+            returnRes <- (false,stack)
+          else 
+            returnRes <- (true,stack)
+          returnRes
     loop (Seq.toList str) previousStack
 
 
@@ -42,7 +48,10 @@ let ParenthesisAnalyser : Analyzer =
         // printfn "i is %d" i
         if trackBalance = true then do 
         // printfn "trackBalance start %b %d" trackBalance 
-            let (balanced,tempStack)= isBalanced contents.[i] trackStack
+            let mutable LastLine = false
+            if (i = contents.Length-1) then do
+              LastLine <- true
+            let (balanced,tempStack)= isBalanced contents.[i] trackStack LastLine
             // printfn "Line Content %d %s is   " i contents.[i] 
             trackStack <- tempStack
             trackBalance <- balanced
