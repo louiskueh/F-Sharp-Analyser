@@ -55,6 +55,7 @@ let ParenthesisAnalyser : Analyzer =
             // printfn "Line Content %d %s is   " i contents.[i] 
             trackStack <- tempStack
             trackBalance <- balanced
+            // if error on line, stack is non empty
             if balanced = false then do 
               // printfn "Found bracket error at line %d" i
               let Startposition = mkPos (i+1) 0
