@@ -82,6 +82,51 @@ let result = add 1
       Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
 
     }
+    test "Parameter should be detected even with brackets" {
+      let input = """let add x y = x + y
+let result =  (add 1 2 3)
+    """
+      // get implementation file contents (typed tree)
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let inputStringArray = input.Split "\n"
+      // printfn "TESTING "
+      // for x in inputStringArray do
+      //   printfn "string is %s" x
+      // printfn "TESTING "
+      // get untyped tree
+      let tree = getUntypedTree(file, input) 
+      // printfn "tree = %A" tree
+      // mockIncorrectParamAnalyser tree
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      printfn "tree %A" tree
+      let result = IncorrectParameters mockContext
+      Expect.equal (result.Length > 0)  true  "Should not have any output for correct code "
+
+    }
+    test "Error on function declaration line should have no errors" {
+      let input = """let add x y = x +
+
+
+    """
+      // get implementation file contents (typed tree)
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let inputStringArray = input.Split "\n"
+      // printfn "TESTING "
+      // for x in inputStringArray do
+      //   printfn "string is %s" x
+      // printfn "TESTING "
+      // get untyped tree
+      let tree = getUntypedTree(file, input) 
+      // printfn "tree = %A" tree
+      // mockIncorrectParamAnalyser tree
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = IncorrectParameters mockContext
+      Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
+
+    }
+
     test "Statistical test cases" {
       let firstInput = "let add x y = x + y"
       let GenerateInput firstInput nums = 

@@ -30,32 +30,49 @@ let mutable functionNames = Map.empty
 
 let rec visitExpression handler body= 
     match body with
+    | SynExpr.Paren(expr,leftParenRange,rightParenRange,range) ->
+        visitExpression handler expr
     | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) -> 
         // printfn "In APP with funcExpr %A | argExpr %A" funcExpr argExpr
         match funcExpr with 
         | SynExpr.Ident(name) -> 
-            // printfn "name of function call: %A" name
-            let containsKey = (Map.containsKey (name.ToString()) functionNames)
-            // printfn "Checking %A exists with function names: %A " name containsKey
-            if containsKey then
-                // let mutable count = 0
-                // countArg body &count  
-                let res = (functionNames.TryFind (name.ToString()))
-                let mutable numArgs = 0
-                match res with
-                    | Some y -> (numArgs <- y)
-                    | None -> ()
-                // printfn "num args %d" numArgs
-                handler range (name.ToString()) numArgs
+        // printfn "name of function call: %A" name
+        let containsKey = (Map.containsKey (name.ToString()) functionNames)
+        // printfn "Checking %A exists with function names: %A " name containsKey
+        if containsKey then
+            // let mutable count = 0
+            // countArg body &count  
+            let res = (functionNames.TryFind (name.ToString()))
+            let mutable numArgs = 0
+            match res with
+                | Some y -> (numArgs <- y)
+                | None -> ()
+            // printfn "num args %d" numArgs
+            handler range (name.ToString()) numArgs
         | _ -> ()
         visitExpression handler funcExpr
         visitExpression handler argExpr
+    | SynExpr.LongIdent(optional,name,refcall,range) -> 
+        let containsKey = (Map.containsKey (name.ToString()) functionNames)
+        // printfn "Checking %A exists with function names: %A " name containsKey
+        if containsKey then
+            // let mutable count = 0
+            // countArg body &count  
+            let res = (functionNames.TryFind (name.ToString()))
+            let mutable numArgs = 0
+            match res with
+                | Some y -> (numArgs <- y)
+                | None -> ()
+            // printfn "num args %d" numArgs
+            handler range (name.ToString()) numArgs
+
     | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->()
         // printfn "Let isUse %A" isUse
         // printfn "Bindings %A" bindings
         // printfn "Body %A" body
         // printfn "range %A" range
 
+            
     | x -> ()
     // printfn "unmatched! %A " x
        
@@ -82,11 +99,13 @@ let rec visitPattern pat data =
     | SynPat.Named(pat, name, _, _, _) ->   
         visitPattern pat data
         printfn "  .. named as '%s'" name.idText
+        let numArgs = visitSynVal data
+        functionNames <- functionNames.Add(name.idText,numArgs)
         // This is for let result =.. -> result
     | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
         let names = 
             String.concat "." [for i in ident -> i.idText]
-        // printfn "  .. identifier: %s" names
+        printfn "  .. identifier: %s" names
         // identifier is name of function call 
         // let add x y =... -> add
         let numArgs = visitSynVal data
@@ -132,9 +151,10 @@ let parseAndCheckSingleFile (input) =
 
 [<Analyzer>]
 let IncorrectParameters : Analyzer  =
+    printfn "IncorrectParameter Analyser"
     functionNames <- Map.empty
     fun ctx ->
-        // printfn "ctx %A" ctx.ParseTree
+        printfn "ctx %A" ctx.ParseTree
         let state = ResizeArray<range>()
         let string = ctx.Content |> String.concat "\n"
         let checkProjectResults = parseAndCheckSingleFile(string)
