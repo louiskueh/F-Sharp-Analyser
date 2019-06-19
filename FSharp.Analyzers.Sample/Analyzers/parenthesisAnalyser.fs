@@ -14,13 +14,13 @@ let isBalanced str previousStack=
         // find ), and (  is already on top
         | ')' :: ys, '(' :: stack -> loop ys stack
         // find ), and ( is not on top, therefore error
-        | ')' :: _, _ -> (false,stack)
+        | ')' :: _, stack -> (false,stack)
         // any other character loop
         | _ :: ys, stack -> loop ys stack
         // both empty then fine
         | [], [] -> (true,stack)
         // empty line and stack is non empty
-        | [], _ -> (false,stack)
+        | [], stack -> (false,stack)
     loop (Seq.toList str) previousStack
 
 
@@ -38,26 +38,26 @@ let ParenthesisAnalyser : Analyzer =
       let mutable trackBalance = true
       
       for i in 0..contents.Length-1 do
-        printfn "Lenght of contents %d" contents.Length
-        printfn "i is %d" i
+        // printfn "Lenght of contents %d" contents.Length
+        // printfn "i is %d" i
         if trackBalance = true then do 
         // printfn "trackBalance start %b %d" trackBalance 
             let (balanced,tempStack)= isBalanced contents.[i] trackStack
-            printfn "Line Content %d %s is   " i contents.[i] 
+            // printfn "Line Content %d %s is   " i contents.[i] 
             trackStack <- tempStack
             trackBalance <- balanced
             if balanced = false then do 
-              printfn "Found bracket error at line %d" i
+              // printfn "Found bracket error at line %d" i
               let Startposition = mkPos (i+1) 0
               let EndPosition = mkPos (i+1) contents.[i].Length
               let range = mkRange ctx.FileName Startposition EndPosition
               state.Add range
-              printfn "state is (Inside loop) %A" state
-              printfn "Added range %A" range
-            else  
-              printfn "state is (Outside loop) %A" state
+              // printfn "state is (Inside loop) %A" state
+              // printfn "Added range %A" range
+            // else  
+              // printfn "state is (Outside loop) %A" state
               // printfn "Expression is balanced"
-      printfn "Finish loop"
+      // printfn "Finish loop"
       // if state.ToArray().Length > 0 then do
       //   printfn "state exists"
       // else  

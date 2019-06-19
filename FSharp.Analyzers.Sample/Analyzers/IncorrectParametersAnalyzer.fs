@@ -25,8 +25,41 @@ let mutable functionNames = Map.empty
 //     | SynExpr.Ident(name)->
 //         count <- count + 1
 //     | x -> printfn "COUNT UNMATCHED %A" x
-
-
+let visitSynVal (x:SynValData) =
+    match x with 
+    | SynValData (memberFlags,synvalInfo,indentOption) ->
+        // printfn "memberFlags %A" memberFlags
+        // printfn "SynvalInfo %A" synvalInfo
+        match synvalInfo with
+        | SynValInfo (curriedArgsInfo, returninfo) ->
+            // printfn "curriedArgsInfo"  
+            // printfn "There are %d args" curriedArgsInfo.Length
+            // for arg in curriedArgsInfo do
+            //     printfn "args %A" arg
+            curriedArgsInfo.Length
+            // printfn "returnInfo %A" returninfo
+        // printfn "indentOption %A" indentOption
+    
+let rec visitPattern pat data = 
+    match pat with
+    | SynPat.Wild(x) -> () 
+    // printfn "  .. underscore pattern"
+    | SynPat.Named(pat, name, _, _, _) ->   
+        visitPattern pat data
+        // printfn "  .. named as '%s'" name.idText
+        let numArgs = visitSynVal data
+        functionNames <- functionNames.Add(name.idText,numArgs)
+        // This is for let result =.. -> result
+    | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
+        let names = 
+            String.concat "." [for i in ident -> i.idText]
+        // printfn "  .. identifier: %s" names
+        // identifier is name of function call 
+        // let add x y =... -> add
+        let numArgs = visitSynVal data
+        functionNames <- functionNames.Add(names,numArgs)
+        ()
+    | _ -> ()
 
 let rec visitExpression handler body= 
     match body with
@@ -65,53 +98,28 @@ let rec visitExpression handler body=
                 | None -> ()
             // printfn "num args %d" numArgs
             handler range (name.ToString()) numArgs
-
-    | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->()
-        // printfn "Let isUse %A" isUse
-        // printfn "Bindings %A" bindings
-        // printfn "Body %A" body
-        // printfn "range %A" range
-
-            
+    | SynExpr.IfThenElse(cond, trueBranch, falseBranchOpt, _, _, _, _) ->
+      // Visit all sub-expressions
+      printfn "Conditional:"
+      visitExpression handler cond
+      visitExpression handler trueBranch
+      falseBranchOpt |> Option.iter (visitExpression handler) 
+    | SynExpr.LetOrUse(isRecurisve,isUse,bindings,body,range) ->
+        for binding in bindings do
+            let (Binding(access, kind, inlin, mutabl, attrs, xmlDoc, 
+                         data, pat, retInfo, init, m, sp)) = binding
+            visitPattern pat data
+            visitExpression handler init
+          // Visit the body expression
+        printfn "And the following body:"
+        visitExpression handler body
+                
     | x -> ()
     // printfn "unmatched! %A " x
        
     // | pat -> printfn "  .. other pattern: %A" pat
-let visitSynVal (x:SynValData) =
-    match x with 
-    | SynValData (memberFlags,synvalInfo,indentOption) ->
-        // printfn "memberFlags %A" memberFlags
-        // printfn "SynvalInfo %A" synvalInfo
-        match synvalInfo with
-        | SynValInfo (curriedArgsInfo, returninfo) ->
-            // printfn "curriedArgsInfo"  
-            // printfn "There are %d args" curriedArgsInfo.Length
-            // for arg in curriedArgsInfo do
-            //     printfn "args %A" arg
-            curriedArgsInfo.Length
-            // printfn "returnInfo %A" returninfo
-        // printfn "indentOption %A" indentOption
-    
-let rec visitPattern pat data = 
-    match pat with
-    | SynPat.Wild(x) -> () 
-    // printfn "  .. underscore pattern"
-    | SynPat.Named(pat, name, _, _, _) ->   
-        visitPattern pat data
-        printfn "  .. named as '%s'" name.idText
-        let numArgs = visitSynVal data
-        functionNames <- functionNames.Add(name.idText,numArgs)
-        // This is for let result =.. -> result
-    | SynPat.LongIdent(LongIdentWithDots(ident, _), _, _, _, _, _) -> 
-        let names = 
-            String.concat "." [for i in ident -> i.idText]
-        printfn "  .. identifier: %s" names
-        // identifier is name of function call 
-        // let add x y =... -> add
-        let numArgs = visitSynVal data
-        functionNames <- functionNames.Add(names,numArgs)
-        ()
-    | _ -> ()
+
+
 
 let visitDeclarations handler decls = 
     for declaration in decls do
@@ -151,10 +159,10 @@ let parseAndCheckSingleFile (input) =
 
 [<Analyzer>]
 let IncorrectParameters : Analyzer  =
-    printfn "IncorrectParameter Analyser"
+    // printfn "IncorrectParameter Analyser"
     functionNames <- Map.empty
     fun ctx ->
-        printfn "ctx %A" ctx.ParseTree
+        // printfn "ctx %A" ctx.ParseTree
         let state = ResizeArray<range>()
         let string = ctx.Content |> String.concat "\n"
         let checkProjectResults = parseAndCheckSingleFile(string)

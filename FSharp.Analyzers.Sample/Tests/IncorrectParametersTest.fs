@@ -79,6 +79,7 @@ let result = add 1
       // mockIncorrectParamAnalyser tree
       let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
       let result = IncorrectParameters mockContext
+
       Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
 
     }
@@ -99,15 +100,15 @@ let result =  (add 1 2 3)
       // printfn "tree = %A" tree
       // mockIncorrectParamAnalyser tree
       let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
-      printfn "tree %A" tree
+      // printfn "tree %A" tree
       let result = IncorrectParameters mockContext
-      Expect.equal (result.Length > 0)  true  "Should not have any output for correct code "
+      let expectedResult = "For function add, which expects 2 arguments "
+      Expect.equal result.[0].Message expectedResult "Should detect function name correctly and identify correct number of arguments "
 
     }
-    test "Error on function declaration line should have no errors" {
-      let input = """let add x y = x +
-
-
+    test "Parameter should be detected on print statements" {
+      let input = """let add x y = x + y
+printfn "%d" (add x y z)
     """
       // get implementation file contents (typed tree)
       let checkProjectResults = parseAndCheckSingleFile(input)
@@ -123,7 +124,28 @@ let result =  (add 1 2 3)
       // mockIncorrectParamAnalyser tree
       let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
       let result = IncorrectParameters mockContext
-      Expect.equal result.IsEmpty  true  "Should not have any output for correct code "
+      Expect.equal (result.Length > 0)  true  "Should not have any output for correct code "
+
+    }
+    test "Parameter should be detected in complex functions" {
+      let input = """let add x y = x + y
+let boo = (([1..10]|> List.sum) + (add 1 2 3) + 5)
+    """
+      // get implementation file contents (typed tree)
+      let checkProjectResults = parseAndCheckSingleFile(input)
+      let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+      let inputStringArray = input.Split "\n"
+      // printfn "TESTING "
+      // for x in inputStringArray do
+      //   printfn "string is %s" x
+      // printfn "TESTING "
+      // get untyped tree
+      let tree = getUntypedTree(file, input) 
+      // printfn "tree = %A" tree
+      // mockIncorrectParamAnalyser tree
+      let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+      let result = IncorrectParameters mockContext
+      Expect.equal (result.Length > 0)  true  "Should have any output for incorrect code "
 
     }
 
