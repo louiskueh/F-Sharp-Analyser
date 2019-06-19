@@ -36,7 +36,7 @@ let ParenthesisAnalyser : Analyzer =
     printfn "Inside Parenthesis analyzer!"
     
     fun ctx ->
-      printfn "RUNNING ANALYSER"
+      // printfn "RUNNING ANALYSER"
       let state = ResizeArray<range>()
       // printfn "ctx %A" ctx.Content
       let contents = ctx.Content
