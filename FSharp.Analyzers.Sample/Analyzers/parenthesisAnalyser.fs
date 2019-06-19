@@ -42,7 +42,7 @@ let ParenthesisAnalyser : Analyzer =
       let contents = ctx.Content
       let mutable trackStack =  []
       let mutable trackBalance = true
-      
+      let mutable bracketState = 0
       for i in 0..contents.Length-1 do
         // printfn "Lenght of contents %d" contents.Length
         // printfn "i is %d" i
@@ -55,13 +55,31 @@ let ParenthesisAnalyser : Analyzer =
             // printfn "Line Content %d %s is   " i contents.[i] 
             trackStack <- tempStack
             trackBalance <- balanced
-            // if error on line, stack is non empty
-            if balanced = false then do 
+            //if error on line, stack is non empty
+
+            
+            if (bracketState= 1 && tempStack.IsEmpty = false && i = contents.Length - 1 ) then do 
               // printfn "Found bracket error at line %d" i
-              let Startposition = mkPos (i+1) 0
+              let previousRange = state.Item 0
+              printfn "Found previous range at %d" previousRange.StartLine
+              let Startposition = mkPos (previousRange.StartLine) 0
               let EndPosition = mkPos (i+1) contents.[i].Length
               let range = mkRange ctx.FileName Startposition EndPosition
+              state.Clear()
               state.Add range
+              ()
+            else if (bracketState = 1 && tempStack.IsEmpty = true ) then do 
+              printfn "Found matching bracket, clearing"
+              bracketState <- 0
+              state.Clear()
+            else if (tempStack.IsEmpty = false) then do 
+              printfn "Found error on line %d " i
+              bracketState <- 1
+              let Startposition = mkPos (i+1) 0
+              let EndPosition = mkPos (i+1) contents.[i].Length
+              let tempRange = mkRange ctx.FileName Startposition EndPosition
+              state.Add tempRange
+              // found matching bracket within source code in other lines
               // printfn "state is (Inside loop) %A" state
               // printfn "Added range %A" range
             // else  
