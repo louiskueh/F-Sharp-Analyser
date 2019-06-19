@@ -10,16 +10,16 @@
 
   <ItemGroup>
 
-    <!-- <Compile Include="Analyzers/IncorrectParametersAnalyzer.fs" /> -->
+    <Compile Include="Analyzers/IncorrectParametersAnalyzer.fs" />
     <!-- <Compile Include="ListFloatAnalyzer.fs" /> -->
     <!-- <Compile Include="Analyzers/parenthesisAnalyser.fs" /> -->
-    <Compile Include="Analyzers/OperatorPrecedence.fs" />
+    <!-- <Compile Include="Analyzers/OperatorPrecedence.fs" /> -->
     <!-- <Compile Include="example.fs" /> -->
     <!-- <Compile Include="Tests/ParenthesisTests.fs" /> -->
     <!-- <Compile Include="Tests/OperatorPrecedenceTestsPrefix.fs" /> -->
-    <Compile Include="Tests/OperatorPrecedenceTests.fs" />
+    <!-- <Compile Include="Tests/OperatorPrecedenceTests.fs" /> -->
 
-    <!-- <Compile Include="Tests/IncorrectParametersTest.fs" /> -->
+    <Compile Include="Tests/IncorrectParametersTest.fs" />
     <Compile Include="Tests/TestRunner.fs" />
 
   </ItemGroup>
