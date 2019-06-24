@@ -1,4 +1,4 @@
-module ParameterTests
+module ParenthesisTests
 open System.IO
 open Expecto
 open FSharp.Analyzers.SDK

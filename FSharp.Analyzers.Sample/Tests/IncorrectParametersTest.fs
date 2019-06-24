@@ -135,11 +135,6 @@ let boo = (([1..10]|> List.sum) + (add 1 2 3) + 5)
       let checkProjectResults = parseAndCheckSingleFile(input)
       let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
       let inputStringArray = input.Split "\n"
-      // printfn "TESTING "
-      // for x in inputStringArray do
-      //   printfn "string is %s" x
-      // printfn "TESTING "
-      // get untyped tree
       let tree = getUntypedTree(file, input) 
       // printfn "tree = %A" tree
       // mockIncorrectParamAnalyser tree
@@ -148,6 +143,24 @@ let boo = (([1..10]|> List.sum) + (add 1 2 3) + 5)
       Expect.equal (result.Length > 0)  true  "Should have any output for incorrect code "
 
     }
+//     test "Parameter should be detected in complex functions" {
+//       let input = """let add x y = x + y
+// let boo = (([1..10]|> List.sum) + (add 1 2 3) + 5)
+//     """
+//       // get implementation file contents (typed tree)
+//       let checkProjectResults = parseAndCheckSingleFile(input)
+//       let typeTree = checkProjectResults.AssemblyContents.ImplementationFiles.[0]
+//       let inputStringArray = input.Split "\n"
+//       let tree = getUntypedTree(file, input) 
+//       // printfn "tree = %A" tree
+//       // mockIncorrectParamAnalyser tree
+//       let mockContext:Context = {FileName=""; Content=inputStringArray; ParseTree=tree; TypedTree= typeTree;Symbols=[] }
+//       let result = IncorrectParameters mockContext
+//       printfn "res %A" result
+//       Expect.equal (result.Length > 0)  true  "Should have any output for incorrect code "
+
+//     }
+
 
     test "Statistical test cases" {
       let firstInput = "let add x y = x + y"

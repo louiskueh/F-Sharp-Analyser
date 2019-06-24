@@ -1,1 +1,108 @@
-﻿<?xml version="1.0" encoding="utf-8"?><test-results date="2019-06-19" name="Expecto.Tests" total="4" errors="0" failures="0" ignored="0" not-run="0" inconclusive="0" skipped="0" invalid="0" time="19:30:01"><environment expecto-version="8.10.1" clr-version="4.0.30319.42000" os-version="Microsoft Windows NT 6.2.9200.0" platform="Linux" cwd="C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample" machine-name="DESKTOP-FMJDU4T" user="Louis" user-domain="DESKTOP-FMJDU4T" /><culture-info current-culture="en-GB" current-uiculture="en-US" /><test-suite type="Assembly" name="Expecto.Tests" executed="True" result="Success" success="True" time="4.001" asserts="0"><results><test-case name="Parenthesis Tests/Parenthesis Tests/Complex case parameter missing" executed="True" result="Success" success="True" time="3.934" asserts="0" /><test-case name="Parenthesis Tests/Parenthesis Tests/Bracket error should be detected accross multiple lines" executed="True" result="Success" success="True" time="3.914" asserts="0" /><test-case name="Parenthesis Tests/Parenthesis Tests/No error should have no error messages" executed="True" result="Success" success="True" time="3.912" asserts="0" /><test-case name="Parenthesis Tests/Parenthesis Tests/Bracket error should not be detected if valid throughout program" executed="True" result="Success" success="True" time="3.912" asserts="0" /></results></test-suite></test-results>
+﻿<?xml version="1.0" encoding="utf-8"?><test-results date="2019-06-19" name="Expecto.Tests" total="34" errors="0" failures="11" ignored="0" not-run="0" inconclusive="0" skipped="0" invalid="0" time="19:35:50"><environment expecto-version="8.10.1" clr-version="4.0.30319.42000" os-version="Microsoft Windows NT 6.2.9200.0" platform="Linux" cwd="C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample" machine-name="DESKTOP-FMJDU4T" user="Louis" user-domain="DESKTOP-FMJDU4T" /><culture-info current-culture="en-GB" current-uiculture="en-US" /><test-suite type="Assembly" name="Expecto.Tests" executed="True" result="Failure" success="False" time="6.349" asserts="0"><results><test-case name="Incorrect Parameter Tests/Parameter analyser test/Parameter should be detected on print statements" executed="True" result="Failure" success="False" time="4.110" asserts="0"><failure><message>
+Should not have any output for correct code .
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32mtrue&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31mfalse&#x1B;[36m
+   at ParameterTests.tests@110-31.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\IncorrectParametersTest.fs:line 127
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Function call code with addition in between errors" executed="True" result="Failure" success="False" time="0.392" asserts="0"><failure><message>
+Expected 2 errors.
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32m2&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31m5&#x1B;[36m
+   at OperatorPrecedencePrefixTests.tests@222-18.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTestsPrefix.fs:line 238
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence  tests/Multiple errors on a line" executed="True" result="Failure" success="False" time="0.296" asserts="0"><failure><message>
+Expected 2 errors.
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32m2&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31m3&#x1B;[36m
+   at OperatorPrecedenceTests.tests@96-21.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTests.fs:line 111
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Error + Case Infix test" executed="True" result="Failure" success="False" time="0.289" asserts="0"><failure><message>
+Expected Message should match. String does not match at position 1. Expected char: 'r', but got 'h'.
+&#x1B;[32mexpected&#x1B;[36m: T&#x1B;[32mry&#x1B;[36m a&#x1B;[32mdding a space betwee&#x1B;[36mn &#x1B;[32m+ and 3&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: T&#x1B;[31mhe&#x1B;[36m a&#x1B;[31mrguments for functio&#x1B;[36mn &#x1B;[31m"result" may need brackets to define arguments near character: "+"&#x1B;[36m
+   at OperatorPrecedencePrefixTests.tests@54-4.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTestsPrefix.fs:line 63
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/3 errors on same line" executed="True" result="Failure" success="False" time="0.287" asserts="0"><failure><message>
+Matching message.
+&#x1B;[32mexpected&#x1B;[36m:
+[&#x1B;[32m]&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m:
+[&#x1B;[31m{Type = "Operator Precedence Analyser ";
+  Message = "Try adding a space between - and 2";
+  Code = "P001";
+  Severity = Warning;
+  Range =  (1,8--1,20) IsSynthetic=false;
+  Fixes = [];}; {Type = "Operator Precedence Analyser ";
+                 Message = "Try adding a space between - and 2";
+                 Code = "P001";
+                 Severity = Warning;
+                 Range =  (1,15--1,20) IsSynthetic=false;
+                 Fixes = [];}]&#x1B;[36m
+   at OperatorPrecedencePrefixTests.tests@124-12.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTestsPrefix.fs:line 129
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Incorrect Parameter Tests/Parameter analyser test/Parameter should be detected in complex functions" executed="True" result="Failure" success="False" time="0.267" asserts="0"><failure><message>
+Should have any output for incorrect code .
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32mtrue&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31mfalse&#x1B;[36m
+   at ParameterTests.tests@131-32.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\IncorrectParametersTest.fs:line 148
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence  tests/One error with function call on error function with the same name" executed="True" result="Failure" success="False" time="0.257" asserts="0"><failure><message>
+Expected 4 errors.
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32m4&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31m2&#x1B;[36m
+   at OperatorPrecedenceTests.tests@232-27.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTests.fs:line 247
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence  tests/Multiple errors with 1 correct line calling functions" executed="True" result="Failure" success="False" time="0.162" asserts="0"><failure><message>
+Expected 4 errors.
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32m4&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31m5&#x1B;[36m
+   at OperatorPrecedenceTests.tests@208-26.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTests.fs:line 224
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Correct simple code in between errors" executed="True" result="Failure" success="False" time="0.153" asserts="0"><failure><message>
+Expected 2 errors.
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32m2&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31m4&#x1B;[36m
+   at OperatorPrecedencePrefixTests.tests@199-17.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTestsPrefix.fs:line 215
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Using functions with incorrect code declarations" executed="True" result="Failure" success="False" time="0.149" asserts="0"><failure><message>
+Expected 2 errors.
+&#x1B;[32mexpected&#x1B;[36m: &#x1B;[32m2&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m: &#x1B;[31m6&#x1B;[36m
+   at OperatorPrecedencePrefixTests.tests@176-16.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTestsPrefix.fs:line 192
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Two errors on same line" executed="True" result="Failure" success="False" time="0.140" asserts="0"><failure><message>
+Matching message.
+&#x1B;[32mexpected&#x1B;[36m:
+[&#x1B;[32m]&#x1B;[36m
+&#x1B;[31m  actual&#x1B;[36m:
+[&#x1B;[31m{Type = "Operator Precedence Analyser ";
+  Message = "Try adding a space between - and 2";
+  Code = "P001";
+  Severity = Warning;
+  Range =  (1,8--1,16) IsSynthetic=false;
+  Fixes = [];}]&#x1B;[36m
+   at OperatorPrecedencePrefixTests.tests@116-11.Invoke(Unit unitVar) in C:\Users\Louis\Programming\FSharp FYP\F-Sharp-Analyser\FSharp.Analyzers.Sample\Tests\OperatorPrecedenceTestsPrefix.fs:line 121
+   at Expecto.Impl.execTestAsync@935-1.Invoke(Unit unitVar) in C:\Users\Anthony Lloyd\src\expecto\Expecto\Expecto.fs:line 939
+   at Microsoft.FSharp.Control.AsyncPrimitives.CallThenInvoke[T,TResult](AsyncActivation`1 ctxt, TResult result1, FSharpFunc`2 part2)
+   at &lt;StartupCode$FSharp-Core&gt;.$Async.StartChild@1641-5.Invoke(AsyncActivation`1 ctxt)
+   at Microsoft.FSharp.Control.Trampoline.Execute(FSharpFunc`2 firstAction)</message></failure></test-case><test-case name="Incorrect Parameter Tests/Parameter analyser test/Default Case TooMany Parameters" executed="True" result="Success" success="True" time="4.053" asserts="0" /><test-case name="Incorrect Parameter Tests/Parameter analyser test/Parameter should be detected even with brackets" executed="True" result="Success" success="True" time="4.053" asserts="0" /><test-case name="Incorrect Parameter Tests/Parameter analyser test/Default Case Too Few Parameters No error" executed="True" result="Success" success="True" time="4.041" asserts="0" /><test-case name="Incorrect Parameter Tests/Parameter analyser test/Statistical test cases" executed="True" result="Success" success="True" time="2.215" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence  tests/Basic function call test" executed="True" result="Success" success="True" time="0.396" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence  tests/Basic pipe test" executed="True" result="Success" success="True" time="0.329" asserts="0" /><test-case name="Parenthesis Tests/Parenthesis Tests/Complex case parameter missing" executed="True" result="Success" success="True" time="0.327" asserts="0" /><test-case name="Parenthesis Tests/Parenthesis Tests/No error should have no error messages" executed="True" result="Success" success="True" time="0.314" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Error across multiple lines " executed="True" result="Success" success="True" time="0.273" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Error in nested expression " executed="True" result="Success" success="True" time="0.270" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/No error + Case Infix test" executed="True" result="Success" success="True" time="0.249" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence  tests/Multiple errors on 2 different lines" executed="True" result="Success" success="True" time="0.172" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence  tests/One error with another correct statement" executed="True" result="Success" success="True" time="0.161" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence  tests/Multiple errors with 1 correct line in between" executed="True" result="Success" success="True" time="0.143" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/ No Error -+ Infix test" executed="True" result="Success" success="True" time="0.141" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence  tests/Error with function call in between +" executed="True" result="Success" success="True" time="0.138" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Multiple errors accross multiple lines " executed="True" result="Success" success="True" time="0.136" asserts="0" /><test-case name="Parenthesis Tests/Parenthesis Tests/Bracket error should be detected accross multiple lines" executed="True" result="Success" success="True" time="0.134" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/Error Case Infix test" executed="True" result="Success" success="True" time="0.128" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/ No Error + Infix test" executed="True" result="Success" success="True" time="0.123" asserts="0" /><test-case name="Parenthesis Tests/Parenthesis Tests/Bracket error should not be detected if valid throughout program" executed="True" result="Success" success="True" time="0.123" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/No error - Case Infix test" executed="True" result="Success" success="True" time="0.118" asserts="0" /><test-case name="Operator Precedence Tests/Operator Precedence prefix tests/ No Error +- Infix test" executed="True" result="Success" success="True" time="0.117" asserts="0" /></results></test-suite></test-results>
