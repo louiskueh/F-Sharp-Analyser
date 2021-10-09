@@ -1,6 +1,6 @@
 # F-Sharp-Analyser
 
-Click here for youtube demo
+[Click below image or here for youtube demo](https://www.youtube.com/watch?v=dM1bFND8u44l)
 [![Alternate Text](https://user-images.githubusercontent.com/2521843/136666770-880ce4b2-44b5-4d9c-9539-5fd5933052d1.PNG)](https://www.youtube.com/watch?v=dM1bFND8u44l)
 
 * [Wiki](https://github.com/jovanhan2/F-Sharp-Analyser/wiki)
