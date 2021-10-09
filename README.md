@@ -1,4 +1,4 @@
-# F-Sharp-Analyser - [Report here](https://github.com/louiskueh/F-Sharp-Analyser/blob/master/Final_Year_Project___Final_Report.pdf) - 
+# F-Sharp-Analyser - [Report here](https://github.com/louiskueh/F-Sharp-Analyser/blob/master/Final_Year_Project___Final_Report.pdf)
 
 ## [Click below image or here for youtube demo](https://www.youtube.com/watch?v=dM1bFND8u44l)
 [![Alternate Text](https://user-images.githubusercontent.com/2521843/136666770-880ce4b2-44b5-4d9c-9539-5fd5933052d1.PNG)](https://www.youtube.com/watch?v=dM1bFND8u44l)
